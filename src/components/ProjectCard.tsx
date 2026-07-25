@@ -109,15 +109,15 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           {project.tagline}
         </p>
 
-        {/* Bottom Row: Tool Pills Only (Removed bottom-right overlapping avatars) */}
+        {/* Bottom Row: Tool Pills Only with Squared Dots */}
         <div className="flex items-center gap-2 mt-1">
           <div className="tool-pill">
-            <div className="w-2.5 h-2.5 bg-[#D97757]" />
+            <div className="w-1.5 h-1.5 bg-[#D97757]" />
             <span className="text-mono-10">Claude code</span>
           </div>
 
           <div className="tool-pill">
-            <div className="w-1 h-1 bg-[#D97757] rounded-full" />
+            <div className="w-1.5 h-1.5 bg-[#0284C7]" />
             <span className="text-mono-10">Fable 5</span>
           </div>
         </div>

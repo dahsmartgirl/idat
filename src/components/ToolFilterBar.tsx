@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import type { CategoryType } from '../types';
+import { SlidersHorizontal } from 'lucide-react';
 
 interface ToolFilterBarProps {
-  selectedCategory: CategoryType;
-  setSelectedCategory: (cat: CategoryType) => void;
-  activeCount: number;
+  onOpenFilterDrawer: () => void;
+  activeFilterCount: number;
 }
-
-const CATEGORIES: CategoryType[] = [
-  'All',
-  'SaaS',
-  'Chrome Extensions',
-  'MCP Servers',
-  'CLI Tools',
-  'Games',
-  'VS Code Extensions',
-  'Mobile Apps',
-  'Experiments'
-];
 
 const SCRAMBLE_CHARS = '0123456789!@#$%^&*~?:;';
 
@@ -59,8 +46,8 @@ const ScrambleNumber: React.FC<{ value: number }> = ({ value }) => {
 };
 
 export const ToolFilterBar: React.FC<ToolFilterBarProps> = ({
-  selectedCategory,
-  setSelectedCategory,
+  onOpenFilterDrawer,
+  activeFilterCount,
 }) => {
   // Always display "300 things." as requested
   const numberVal = 300;
@@ -77,20 +64,20 @@ export const ToolFilterBar: React.FC<ToolFilterBarProps> = ({
         </span>
       </div>
 
-      {/* Clean text filter control (NOT a button) */}
-      <div className="flex items-center gap-1">
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value as CategoryType)}
-          className="filter-text-select"
-        >
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat} className="bg-[#F2F1F3] text-[#545454]">
-              {cat === 'All' ? 'filter things ▾' : cat}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* Redesigned Filter Button: Right-aligned, Filter Icon + filter text */}
+      <button
+        onClick={onOpenFilterDrawer}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E9E9E9] text-[#101010] hover:bg-[#E0E0E0] transition-all font-sans text-xs font-medium cursor-pointer"
+        title="Open filters"
+      >
+        <SlidersHorizontal className="w-3.5 h-3.5 stroke-[2]" />
+        <span>filter</span>
+        {activeFilterCount > 0 && (
+          <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#101010] text-white text-[9px] font-mono">
+            {activeFilterCount}
+          </span>
+        )}
+      </button>
     </div>
   );
 };

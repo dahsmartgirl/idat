@@ -14,7 +14,7 @@ export interface AiTool {
   id: string;
   name: string;
   slug: string;
-  logoSvg: string; // Identifying string for SVG rendering
+  logoSvg: string;
 }
 
 export interface TimelineMilestone {
@@ -35,12 +35,13 @@ export interface Project {
   id: string;
   slug: string;
   name: string;
-  tagline: string; // One-liner
+  tagline: string;
   description: string;
   isClaimed: boolean;
-  claimedBy: string[]; // Builder handles e.g. ["@ileri", "@josh"]
-  primaryTool: string; // Tool ID e.g. 'claude-code'
-  aiTools: string[];   // Array of tool IDs e.g. ['claude-code', 'cursor']
+  claimedBy: string[];
+  primaryTool: string;
+  aiTools: string[];
+  aiModel?: string;
   category: CategoryType;
   tags: string[];
   techStack: string[];
@@ -58,16 +59,23 @@ export interface Project {
 
 export interface Builder {
   id: string;
-  username: string; // e.g. "ileri"
+  username: string;
   displayName: string;
   role: string;
   avatarUrl: string;
   bio: string;
   isFoundingBuilder: boolean;
-  foundingNumber?: number; // e.g. 42
+  foundingNumber?: number;
   joinedDate: string;
   websiteUrl?: string;
   githubUrl?: string;
   xUrl?: string;
   topTools: string[];
+}
+
+export interface FilterState {
+  aiTools: string[];
+  categories: CategoryType[];
+  aiModels: string[];
+  status: 'all' | 'claimed' | 'unclaimed';
 }

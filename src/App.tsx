@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { Header } from './components/Header';
 import { ToolFilterBar } from './components/ToolFilterBar';
@@ -7,13 +8,22 @@ import { ProjectDrawer } from './components/ProjectDrawer';
 import { BuilderProfileModal } from './components/BuilderProfileModal';
 import { SubmitModal } from './components/SubmitModal';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
+import { FilterDrawer } from './components/FilterDrawer';
 import { MOCK_PROJECTS, MOCK_BUILDERS } from './data/mockData';
-import type { Project, CategoryType, Builder } from './types';
+import type { Project, Builder, FilterState } from './types';
 
 function ArchiveApp() {
   const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<CategoryType>('All');
+
+  // Rich Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    aiTools: [],
+    categories: [],
+    aiModels: [],
+    status: 'all',
+  });
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   // Modals & Drawers state
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -22,23 +32,57 @@ function ArchiveApp() {
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
-  // Filter logic
+  // Filter calculation logic
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
-      if (selectedCategory !== 'All' && project.category !== selectedCategory) {
-        return false;
-      }
+      // 1. Search Query Filter
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase();
         const matchesName = project.name.toLowerCase().includes(query);
         const matchesTagline = project.tagline.toLowerCase().includes(query);
         const matchesTools = project.aiTools.some((t) => t.toLowerCase().includes(query));
         const matchesTags = project.tags.some((t) => t.toLowerCase().includes(query));
-        return matchesName || matchesTagline || matchesTools || matchesTags;
+        if (!matchesName && !matchesTagline && !matchesTools && !matchesTags) {
+          return false;
+        }
       }
+
+      // 2. AI Tools Filter
+      if (filters.aiTools.length > 0) {
+        const hasTool = filters.aiTools.some(
+          (toolId) =>
+            project.primaryTool === toolId || project.aiTools.includes(toolId)
+        );
+        if (!hasTool) return false;
+      }
+
+      // 3. Categories Filter
+      if (filters.categories.length > 0) {
+        if (!filters.categories.includes(project.category)) {
+          return false;
+        }
+      }
+
+      // 4. AI Models Filter
+      if (filters.aiModels.length > 0) {
+        if (!project.aiModel || !filters.aiModels.includes(project.aiModel)) {
+          return false;
+        }
+      }
+
+      // 5. Status Filter
+      if (filters.status === 'claimed' && !project.isClaimed) return false;
+      if (filters.status === 'unclaimed' && project.isClaimed) return false;
+
       return true;
     });
-  }, [projects, selectedCategory, searchQuery]);
+  }, [projects, searchQuery, filters]);
+
+  const activeFilterCount =
+    filters.aiTools.length +
+    filters.categories.length +
+    filters.aiModels.length +
+    (filters.status !== 'all' ? 1 : 0);
 
   const handleSelectBuilder = (builderHandle: string) => {
     const cleanHandle = builderHandle.replace('@', '');
@@ -83,35 +127,53 @@ function ArchiveApp() {
   }, [projects, activeBuilder]);
 
   return (
-    <div className="min-h-screen bg-[#F2F1F3] text-[#545454] flex flex-col font-sans w-full">
-      {/* Header */}
-      <Header
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        onOpenSubmit={() => {
-          setClaimingProject(null);
-          setIsSubmitOpen(true);
+    <div className="min-h-screen bg-[#F2F1F3] text-[#545454] flex flex-col font-sans w-full overflow-x-hidden relative">
+      
+      {/* Main Page Content Wrapper (Pushed out to the left when Filter Side Drawer is Open) */}
+      <motion.div
+        animate={{
+          x: isFilterDrawerOpen ? -380 : 0,
         }}
-        onOpenFavorites={() => setIsFavoritesOpen(true)}
-        onOpenProfile={() => handleSelectBuilder('ileri')}
+        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+        className="flex-1 flex flex-col w-full"
+      >
+        {/* Header */}
+        <Header
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onOpenSubmit={() => {
+            setClaimingProject(null);
+            setIsSubmitOpen(true);
+          }}
+          onOpenFavorites={() => setIsFavoritesOpen(true)}
+          onOpenProfile={() => handleSelectBuilder('ileri')}
+        />
+
+        {/* Main Full-Width Content Container */}
+        <main className="flex-1 w-full py-2">
+          {/* Tool Filter Bar & 300 things. */}
+          <ToolFilterBar
+            onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
+            activeFilterCount={activeFilterCount}
+          />
+
+          {/* Masonry Grid */}
+          <ProjectMasonry
+            projects={filteredProjects}
+            onSelectProject={(proj) => setActiveProject(proj)}
+            onOpenClaim={handleOpenClaim}
+          />
+        </main>
+      </motion.div>
+
+      {/* Filter Side Drawer */}
+      <FilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onApplyFilters={(newFilters) => setFilters(newFilters)}
+        totalFilteredCount={filteredProjects.length}
       />
-
-      {/* Main Full-Width Content Container */}
-      <main className="flex-1 w-full py-2">
-        {/* Tool Filter Bar & 200 things+ */}
-        <ToolFilterBar
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          activeCount={filteredProjects.length}
-        />
-
-        {/* Masonry Grid */}
-        <ProjectMasonry
-          projects={filteredProjects}
-          onSelectProject={(proj) => setActiveProject(proj)}
-          onOpenClaim={handleOpenClaim}
-        />
-      </main>
 
       {/* Drawers & Modals */}
       <ProjectDrawer
