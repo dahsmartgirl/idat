@@ -47,10 +47,7 @@ const ScrambleNumber: React.FC<{ value: number }> = ({ value }) => {
       }, 45);
     };
 
-    // Scramble on initial load and category changes
     runScramble();
-
-    // Periodically trigger scramble every 6.5s
     const periodicTimer = setInterval(runScramble, 6500);
 
     return () => {
@@ -64,19 +61,19 @@ const ScrambleNumber: React.FC<{ value: number }> = ({ value }) => {
 export const ToolFilterBar: React.FC<ToolFilterBarProps> = ({
   selectedCategory,
   setSelectedCategory,
-  activeCount,
 }) => {
-  const numberVal = activeCount * 25 + 150;
+  // Always display "300 things." as requested
+  const numberVal = 300;
 
   return (
     <div className="w-full flex items-center justify-between px-4 sm:px-8 py-4 bg-[#F2F1F3]">
-      {/* Number with character scramble animation (Cascadia Mono 16px) + things+ (Inter 16px) */}
+      {/* 300 (Cascadia Mono 16px) + things. (Inter 16px) */}
       <div className="flex items-baseline gap-1">
-        <span className="text-mono-20 cursor-pointer" title="Things count">
+        <span className="text-mono-20 cursor-pointer" title="300 things">
           <ScrambleNumber value={numberVal} />
         </span>
         <span className="text-inter-20">
-          things+
+          things.
         </span>
       </div>
 
