@@ -22,10 +22,17 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
-    <header className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-[#F2F1F3] relative z-20">
+    <header className="w-full px-4 sm:px-8 h-[56px] flex items-center justify-between bg-[#F2F1F3] relative z-20 overflow-hidden shrink-0 mt-2 sm:mt-3">
       
-      {/* 1. Left Section: Logo */}
-      <div className="flex-1 flex items-center justify-start">
+      {/* 1. Left Section: Logo (Only slides on mobile when mobile search is open) */}
+      <motion.div
+        animate={{ 
+          opacity: mobileSearchOpen ? 0 : 1, 
+          x: mobileSearchOpen ? -60 : 0,
+        }}
+        transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+        className={`flex-1 flex items-center justify-start shrink-0 ${mobileSearchOpen ? 'pointer-events-none sm:pointer-events-auto' : ''}`}
+      >
         <a href="#" className="flex items-center gap-2 group">
           <img 
             src="/idat logo color.svg" 
@@ -33,12 +40,12 @@ export const Header: React.FC<HeaderProps> = ({
             className="h-[13.5px] w-auto block opacity-90 hover:opacity-100 transition-opacity"
           />
         </a>
-      </div>
+      </motion.div>
 
-      {/* 2. Center Section: Desktop Search Pill (hidden on mobile, centered on sm+) */}
-      <div className="hidden sm:flex justify-center flex-1 max-w-[338px] px-2">
-        <div className="relative w-full">
-          <div className="absolute left-3 top-2.5 pointer-events-none text-[#545454]/70">
+      {/* 2. Desktop Search Bar: PERMANENT, ALWAYS VISIBLE on sm+ screens, Vertically Centered */}
+      <div className="hidden sm:flex items-center justify-center flex-1 max-w-[338px] px-2 h-full">
+        <div className="relative w-full flex items-center">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#545454]/70">
             <Search className="w-3.5 h-3.5" />
           </div>
 
@@ -47,21 +54,66 @@ export const Header: React.FC<HeaderProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="search..."
-            className="pill-search"
+            className="pill-search w-full"
           />
         </div>
       </div>
 
-      {/* 3. Right Section: Controls (Search Icon on Mobile -> Bookmark Icon -> +new Button -> Avatar Circle) */}
-      <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-2">
-        
-        {/* Mobile Search Icon Button (turns into icon only on mobile aligned with bookmark icon) */}
+      {/* 3. Mobile Expanding Search Overlay: ONLY renders on mobile (<sm) when mobileSearchOpen is true */}
+      <AnimatePresence>
+        {mobileSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+            className="absolute left-4 right-4 z-30 flex items-center justify-center w-[calc(100%-32px)] sm:hidden h-full"
+          >
+            <div className="relative w-full flex items-center">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#545454]/70">
+                <Search className="w-3.5 h-3.5" />
+              </div>
+
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="search..."
+                autoFocus
+                className="pill-search !max-w-none w-full"
+              />
+
+              <button
+                onClick={() => {
+                  setMobileSearchOpen(false);
+                  setSearchQuery('');
+                }}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#545454] hover:text-black transition-colors"
+                title="Close search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 4. Right Section: Controls */}
+      <motion.div
+        animate={{ 
+          opacity: mobileSearchOpen ? 0 : 1, 
+          x: mobileSearchOpen ? 60 : 0,
+        }}
+        transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+        className={`flex-1 flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 ${mobileSearchOpen ? 'pointer-events-none sm:pointer-events-auto' : ''}`}
+      >
+        {/* Mobile Search Icon Button */}
         <button
-          onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+          onClick={() => setMobileSearchOpen(true)}
           className="sm:hidden text-[#545454] hover:opacity-80 transition-opacity p-1"
-          title="Search"
+          title="Open Search"
         >
-          {mobileSearchOpen ? <X className="w-[18px] h-[18px]" /> : <Search className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+          <Search className="w-[18px] h-[18px]" strokeWidth={1.5} />
         </button>
 
         {/* Bookmark Icon */}
@@ -78,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </button>
 
-        {/* +new Button with Diagonal Luxury Light Sheen Animation (h-[27px]) */}
+        {/* +new Button */}
         <button
           onClick={onOpenSubmit}
           className="btn-main relative overflow-hidden flex items-center gap-1 group"
@@ -100,7 +152,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="relative z-10 text-white/90">new</span>
         </button>
 
-        {/* Avatar Circle (matches 27px height of +new button) */}
+        {/* Avatar Circle (27px) */}
         <button
           onClick={onOpenProfile}
           className="avatar-circle"
@@ -108,33 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <span className="font-mono text-[9px]">@i</span>
         </button>
-      </div>
-
-      {/* Mobile Expandable Search Bar Overlay */}
-      <AnimatePresence>
-        {mobileSearchOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 p-3 bg-[#F2F1F3] border-b border-black/10 sm:hidden z-30 shadow-md"
-          >
-            <div className="relative w-full">
-              <div className="absolute left-3 top-2.5 pointer-events-none text-[#545454]/70">
-                <Search className="w-3.5 h-3.5" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="search..."
-                autoFocus
-                className="pill-search w-full"
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </motion.div>
 
     </header>
   );

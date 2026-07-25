@@ -8,6 +8,8 @@
 
 * {
   letter-spacing: 0 !important;
+  scrollbar-width: thin;
+  scrollbar-color: #C2C2C2 #F2F1F3;
 }
 
 html, body {
@@ -18,6 +20,25 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F2F1F3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C2C2C2;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999999;
 }
 
 /* Light Sweep Shimmer Animation */
@@ -102,21 +123,22 @@ html, body {
   letter-spacing: 0 !important;
 }
 
-/* Scaled Search Pill with Lowercase Placeholder */
+/* Scaled Search Pill: Stays Steady #E5E5E5 Normal Background On Focus, Perfectly Centered Vertically */
 .pill-search {
   background: #e5e5e5 !important;
   border-radius: 24px !important;
   height: 38px !important;
   width: 100% !important;
-  border: 1px solid transparent !important;
+  border: none !important;
   outline: none !important;
   padding-left: 34px !important;
-  padding-right: 14px !important;
+  padding-right: 32px !important;
   font-family: 'Inter', sans-serif !important;
   font-size: 13px !important;
   color: #101010 !important;
   letter-spacing: 0 !important;
-  transition: all 0.2s ease-in-out !important;
+  box-shadow: none !important;
+  line-height: 38px !important;
 }
 
 .pill-search::placeholder {
@@ -124,16 +146,14 @@ html, body {
   font-size: 13px !important;
   opacity: 0.75 !important;
   text-transform: lowercase !important;
+  line-height: 38px !important;
 }
 
-.pill-search:hover {
-  background: #dedede !important;
-}
-
-.pill-search:focus {
-  background: #ffffff !important;
-  border-color: rgba(16, 16, 16, 0.2) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+.pill-search:hover, .pill-search:focus, .pill-search:active {
+  background: #e5e5e5 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Main Global Button: h-[27px], fully rounded #101010 black, Inter font */
