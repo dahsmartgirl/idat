@@ -2,12 +2,14 @@ import React from 'react';
 import type { Project } from '../types';
 import { Bookmark, ArrowUpRight } from 'lucide-react';
 import { useFavorites } from '../context/FavoritesContext';
+import { ToolLogo } from './ToolLogos';
 
 interface ProjectCardProps {
   project: Project;
   heightClass?: string;
   onSelectProject: (project: Project) => void;
   onOpenClaim: (project: Project) => void;
+  onSelectBuilder?: (handle: string) => void;
 }
 
 // Curated vibrant gradients for claimed builder avatars
@@ -25,6 +27,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   heightClass = 'h-[304px]',
   onSelectProject,
   onOpenClaim,
+  onSelectBuilder,
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorited = isFavorite(project.id);
@@ -69,11 +72,17 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               {project.name}
             </span>
 
-            {/* If claimed: Avatar near title. If unclaimed: badge near title */}
+            {/* If claimed: Avatar near title opens Builder Profile Page */}
             {project.isClaimed ? (
-              <div 
-                className={`w-[16px] h-[16px] rounded-full outline-[1.2px] outline-[#F2F1F3] shrink-0 ${claimedAvatarGrad}`} 
-                title={`Claimed by @${project.claimedBy[0] || 'ileri'}`}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onSelectBuilder) {
+                    onSelectBuilder(project.claimedBy[0] || 'ileri');
+                  }
+                }}
+                className={`w-[16px] h-[16px] rounded-full outline-[1.2px] outline-[#F2F1F3] shrink-0 hover:scale-110 transition-transform cursor-pointer ${claimedAvatarGrad}`} 
+                title={`Claimed by @${project.claimedBy[0] || 'ileri'} (Click to view profile)`}
               />
             ) : (
               <button
@@ -109,17 +118,27 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           {project.tagline}
         </p>
 
-        {/* Bottom Row: Tool Pills Only with Squared Dots */}
-        <div className="flex items-center gap-2 mt-1">
-          <div className="tool-pill">
-            <div className="w-1.5 h-1.5 bg-[#D97757]" />
-            <span className="text-mono-10">Claude code</span>
-          </div>
-
-          <div className="tool-pill">
-            <div className="w-1.5 h-1.5 bg-[#0284C7]" />
-            <span className="text-mono-10">Fable 5</span>
-          </div>
+        {/* Bottom Row: AI Tool Pills with Official Vector Logos */}
+        <div className="flex items-center gap-1.5 flex-wrap mt-1">
+          {project.aiTools && project.aiTools.length > 0 ? (
+            project.aiTools.slice(0, 3).map((tool) => (
+              <div key={tool} className="tool-pill">
+                <ToolLogo toolId={tool} size={11} />
+                <span className="text-mono-10">{tool}</span>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="tool-pill">
+                <ToolLogo toolId="claude-code" size={11} />
+                <span className="text-mono-10">Claude code</span>
+              </div>
+              <div className="tool-pill">
+                <ToolLogo toolId="cursor" size={11} />
+                <span className="text-mono-10">Cursor</span>
+              </div>
+            </>
+          )}
         </div>
 
       </div>

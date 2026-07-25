@@ -1,22 +1,24 @@
 import { useState, useMemo } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { Header } from './components/Header';
 import { ToolFilterBar } from './components/ToolFilterBar';
 import { ProjectMasonry } from './components/ProjectMasonry';
 import { ProjectDrawer } from './components/ProjectDrawer';
-import { BuilderProfileModal } from './components/BuilderProfileModal';
+import { BuilderProfilePage } from './components/BuilderProfilePage';
 import { SubmitModal } from './components/SubmitModal';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { FilterDrawer } from './components/FilterDrawer';
-import { MOCK_PROJECTS, MOCK_BUILDERS } from './data/mockData';
-import type { Project, Builder, FilterState } from './types';
+import { MOCK_PROJECTS } from './data/mockData';
+import type { Project, FilterState } from './types';
 
-function ArchiveApp() {
+function AppLayout() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Rich Filter state
+  // Rich Filter state for home grid
   const [filters, setFilters] = useState<FilterState>({
     aiTools: [],
     categories: [],
@@ -27,12 +29,11 @@ function ArchiveApp() {
 
   // Modals & Drawers state
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [activeBuilder, setActiveBuilder] = useState<Builder | null>(null);
   const [claimingProject, setClaimingProject] = useState<Project | null>(null);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
-  // Filter calculation logic
+  // Filter calculation logic for Home Grid
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
       // 1. Search Query Filter
@@ -86,19 +87,7 @@ function ArchiveApp() {
 
   const handleSelectBuilder = (builderHandle: string) => {
     const cleanHandle = builderHandle.replace('@', '');
-    const foundBuilder = MOCK_BUILDERS[cleanHandle] || {
-      id: `b-${cleanHandle}`,
-      username: cleanHandle,
-      displayName: `Ilerioluwa`,
-      role: 'Product Designer & AI Builder',
-      avatarUrl: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80`,
-      bio: 'Building experimental software with Claude Code & Cursor. Passionate about natural language developer interfaces.',
-      isFoundingBuilder: true,
-      foundingNumber: 42,
-      joinedDate: 'July 2026',
-      topTools: ['claude-code', 'cursor']
-    };
-    setActiveBuilder(foundBuilder);
+    navigate(`/${cleanHandle}`);
   };
 
   const handleOpenClaim = (project: Project) => {
@@ -121,11 +110,6 @@ function ArchiveApp() {
     }
   };
 
-  const builderProjects = useMemo(() => {
-    if (!activeBuilder) return [];
-    return projects.filter((p) => p.claimedBy.includes(activeBuilder.username));
-  }, [projects, activeBuilder]);
-
   return (
     <div className="min-h-screen bg-[#F2F1F3] text-[#545454] flex flex-col font-sans w-full overflow-x-hidden relative">
       
@@ -137,7 +121,7 @@ function ArchiveApp() {
         transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
         className="flex-1 flex flex-col w-full"
       >
-        {/* Header */}
+        {/* PERSISTENT HEADER across all routes */}
         <Header
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -149,24 +133,56 @@ function ArchiveApp() {
           onOpenProfile={() => handleSelectBuilder('ileri')}
         />
 
-        {/* Main Full-Width Content Container */}
+        {/* Dynamic Main Body Content via Router */}
         <main className="flex-1 w-full py-2">
-          {/* Tool Filter Bar & 300 things. */}
-          <ToolFilterBar
-            onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
-            activeFilterCount={activeFilterCount}
-          />
+          <Routes>
+            {/* Main Archive Grid */}
+            <Route
+              path="/"
+              element={
+                <>
+                  <ToolFilterBar
+                    onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
+                    activeFilterCount={activeFilterCount}
+                  />
 
-          {/* Masonry Grid */}
-          <ProjectMasonry
-            projects={filteredProjects}
-            onSelectProject={(proj) => setActiveProject(proj)}
-            onOpenClaim={handleOpenClaim}
-          />
+                  <ProjectMasonry
+                    projects={filteredProjects}
+                    searchQuery={searchQuery}
+                    onClearSearch={() => {
+                      setSearchQuery('');
+                      setFilters({
+                        aiTools: [],
+                        categories: [],
+                        aiModels: [],
+                        status: 'all',
+                      });
+                    }}
+                    onSelectProject={(proj) => setActiveProject(proj)}
+                    onOpenClaim={handleOpenClaim}
+                    onSelectBuilder={handleSelectBuilder}
+                  />
+                </>
+              }
+            />
+
+            {/* Direct Profile Route domain/username (e.g. domain/ileri) */}
+            <Route
+              path="/:username"
+              element={
+                <BuilderProfilePage
+                  searchQuery={searchQuery}
+                  onSelectProject={(proj) => setActiveProject(proj)}
+                  onOpenClaim={handleOpenClaim}
+                  onSelectBuilder={handleSelectBuilder}
+                />
+              }
+            />
+          </Routes>
         </main>
       </motion.div>
 
-      {/* Filter Side Drawer */}
+      {/* Main Home Filter Side Drawer */}
       <FilterDrawer
         isOpen={isFilterDrawerOpen}
         onClose={() => setIsFilterDrawerOpen(false)}
@@ -180,14 +196,6 @@ function ArchiveApp() {
         project={activeProject}
         onClose={() => setActiveProject(null)}
         onSelectBuilder={handleSelectBuilder}
-        onOpenClaim={handleOpenClaim}
-      />
-
-      <BuilderProfileModal
-        builder={activeBuilder}
-        builderProjects={builderProjects}
-        onClose={() => setActiveBuilder(null)}
-        onSelectProject={(p) => setActiveProject(p)}
         onOpenClaim={handleOpenClaim}
       />
 
@@ -214,7 +222,9 @@ function ArchiveApp() {
 export default function App() {
   return (
     <FavoritesProvider>
-      <ArchiveApp />
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
     </FavoritesProvider>
   );
 }

@@ -17,13 +17,14 @@ import { useFavorites } from '../context/FavoritesContext';
 interface ProjectDrawerProps {
   project: Project | null;
   onClose: () => void;
-  onSelectBuilder: (handle: string) => void;
+  onSelectBuilder?: (handle: string) => void;
   onOpenClaim: (project: Project) => void;
 }
 
 export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   project,
   onClose,
+  onSelectBuilder,
   onOpenClaim,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'notes' | 'timeline'>('overview');
@@ -58,10 +59,23 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               <span className="badge-unclaimed">
                 {project.category}
               </span>
-              {!project.isClaimed && (
+              {project.isClaimed ? (
+                <button
+                  onClick={() => {
+                    onClose();
+                    if (onSelectBuilder) {
+                      onSelectBuilder(project.claimedBy[0] || 'ileri');
+                    }
+                  }}
+                  className="text-mono-10 font-bold text-[#101010] hover:underline cursor-pointer flex items-center gap-1"
+                  title="View builder profile page"
+                >
+                  <span>built by @{project.claimedBy[0] || 'ileri'}</span>
+                </button>
+              ) : (
                 <button
                   onClick={() => onOpenClaim(project)}
-                  className="text-mono-10 font-bold text-[#545454] hover:underline"
+                  className="text-mono-10 font-bold text-[#545454] hover:underline cursor-pointer"
                 >
                   unclaimed (claim)
                 </button>
