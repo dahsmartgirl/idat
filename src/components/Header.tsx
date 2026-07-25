@@ -92,7 +92,7 @@ const DynamicSearchInput: React.FC<DynamicSearchInputProps> = ({
         className={`${className} relative z-0`}
       />
 
-      {/* Typewriter Effect Placeholder (No Blur, No search "" wrapper text, types out category names letter by letter with blinking cursor) */}
+      {/* Typewriter Effect Placeholder (Reverted Cursor to standard bg-[#545454]/70) */}
       {value === '' && !isFocused && (
         <div className="absolute left-9 top-1/2 -translate-y-1/2 pointer-events-none z-10 flex items-center select-none">
           <span className="text-[#545454]/75 font-sans text-[13px] font-normal">

@@ -54,7 +54,7 @@ html, body {
   }
 }
 
-/* Scaled Down Global Typography (80% scale) */
+/* Consolidated Global Typography Tokens (Scaled & Standardized) */
 .text-mono-20 {
   color: #545454 !important;
   font-size: 16px !important;
@@ -71,7 +71,7 @@ html, body {
   letter-spacing: 0 !important;
 }
 
-/* Project Titles: Solid #101010 black font */
+/* 13px-14px Medium Titles */
 .text-inter-16 {
   color: #101010 !important;
   font-size: 13px !important;
@@ -80,6 +80,7 @@ html, body {
   letter-spacing: 0 !important;
 }
 
+/* Standard Secondary Text / Bio / Descriptions (11.5px Inter) */
 .text-inter-14 {
   color: #545454 !important;
   font-size: 11.5px !important;
@@ -88,6 +89,7 @@ html, body {
   letter-spacing: 0 !important;
 }
 
+/* Standard Monospace Micro Text (8.5px Cascadia Mono) */
 .text-mono-10 {
   color: #545454 !important;
   font-size: 8.5px !important;

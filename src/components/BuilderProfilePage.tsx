@@ -172,28 +172,28 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
         {/* Top Profile Header Block */}
         <div className="w-full px-4 sm:px-8 pt-6 sm:pt-10 space-y-4">
           
-          {/* Row 1: Pure Gradient Avatar (No Initials) + Responsive User Info Column */}
+          {/* Row 1: Pure Gradient Avatar + User Info Column */}
           <div className="flex items-center gap-4 sm:gap-8 min-w-0">
             
-            {/* Pure Gradient Avatar Circle (Scales smoothly: 80px on mobile -> 112px on tablet -> 144px on desktop) */}
+            {/* Pure Gradient Avatar Circle */}
             <div className="w-20 h-20 xs:w-28 xs:h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-[#101010] via-[#2A2A2A] to-[#545454] shrink-0 shadow-sm border border-[#E0E0E0]/50" />
 
             {/* User Info Column */}
             <div className="space-y-1 sm:space-y-1.5 min-w-0 flex-1">
               
-              {/* @username: Mono font, Blue (#1A73E8) */}
-              <h1 className="text-mono-20 !text-[#1A73E8] font-medium tracking-tight truncate">
+              {/* @username: Slightly reduced font size (15px), no tracking (letter-spacing: 0), Blue (#1A73E8) */}
+              <h1 className="font-mono text-[15px] sm:text-[16px] !text-[#1A73E8] font-medium tracking-normal truncate">
                 @{builder.username}
               </h1>
 
-              {/* builder #42: Exact #545454 grey matching 3 things. */}
-              <div className="text-inter-16 !text-[#545454] flex items-baseline gap-1">
+              {/* builder #42: Font size matches bio (text-inter-14) */}
+              <div className="text-inter-14 !text-[#545454] flex items-baseline gap-1">
                 <span className="text-[#545454]">builder #</span>
                 <ScrambleNumber value={builder.foundingNumber || 42} color="#1A73E8" />
               </div>
 
-              {/* Social Icons • Personal link alone (e.g. "ileri.dev") */}
-              <div className="flex items-center gap-2 pt-0.5 sm:pt-1 text-inter-16 flex-wrap">
+              {/* Social Icons (Slightly reduced to 13.5px) • Personal link alone (Font size matches bio text-inter-14) */}
+              <div className="flex items-center gap-2 pt-0.5 sm:pt-1 text-inter-14 flex-wrap">
                 
                 {/* GitHub icon */}
                 <a
@@ -203,7 +203,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
                   className="text-[#545454] hover:text-[#101010] transition-colors"
                   title="GitHub Profile"
                 >
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                   </svg>
                 </a>
@@ -216,12 +216,12 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
                   className="text-[#545454] hover:text-[#101010] transition-colors"
                   title="Twitter / X Profile"
                 >
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                 </a>
 
-                {/* Personal Domain Link alone (e.g. "ileri.dev") */}
+                {/* Personal Domain Link alone (e.g. "ileri.dev") matching bio font size text-inter-14 */}
                 {builder.websiteUrl && (
                   <>
                     <span className="text-[#545454]">•</span>
@@ -229,7 +229,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
                       href={builder.websiteUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="!text-[#545454] font-medium text-inter-16 hover:underline transition-colors"
+                      className="!text-[#545454] font-normal text-inter-14 hover:underline transition-colors"
                     >
                       {cleanHandle === 'ileri' ? 'ileri.dev' : builder.websiteUrl.replace('https://', '').replace('http://', '')}
                     </a>
@@ -242,9 +242,9 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
 
           </div>
 
-          {/* Bio & AI Stack Tags (Grouped Tight, Solid #545454 grey text matching project description) */}
+          {/* Bio & AI Stack Tags (Grouped Tight, Solid #545454 grey text matching project description text-inter-14) */}
           <div className="space-y-2 pt-1">
-            {/* Bio (Exact #545454 grey matching project description) */}
+            {/* Bio (text-inter-14) */}
             {builder.bio && (
               <p className="text-inter-14 text-[#545454] max-w-2xl leading-relaxed">
                 {builder.bio}
