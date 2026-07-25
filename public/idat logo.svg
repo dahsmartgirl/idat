@@ -1,0 +1,230 @@
+<svg width="59" height="17" viewBox="0 0 59 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+svg { overflow: visible; }
+@keyframes kf_logo-mark_transform_0 {
+  0% {
+    transform: translate(8.36px, 8.25px) rotate(0rad) scaleX(0) scaleY(0) translate(-8.36px, -8.25px);
+  }
+  1.67% {
+    transform: translate(8.36px, 8.25px) rotate(0.07rad) scaleX(0.008) scaleY(0.008) translate(-8.36px, -8.25px);
+  }
+  3.33% {
+    transform: translate(8.36px, 8.25px) rotate(0.139rad) scaleX(0.029) scaleY(0.029) translate(-8.36px, -8.25px);
+  }
+  5% {
+    transform: translate(8.36px, 8.25px) rotate(0.209rad) scaleX(0.062) scaleY(0.062) translate(-8.36px, -8.25px);
+  }
+  6.67% {
+    transform: translate(8.36px, 8.25px) rotate(0.279rad) scaleX(0.105) scaleY(0.105) translate(-8.36px, -8.25px);
+  }
+  8.33% {
+    transform: translate(8.36px, 8.25px) rotate(0.349rad) scaleX(0.156) scaleY(0.156) translate(-8.36px, -8.25px);
+  }
+  10% {
+    transform: translate(8.36px, 8.25px) rotate(0.419rad) scaleX(0.215) scaleY(0.215) translate(-8.36px, -8.25px);
+  }
+  11.67% {
+    transform: translate(8.36px, 8.25px) rotate(0.489rad) scaleX(0.28) scaleY(0.28) translate(-8.36px, -8.25px);
+  }
+  13.33% {
+    transform: translate(8.36px, 8.25px) rotate(0.558rad) scaleX(0.352) scaleY(0.352) translate(-8.36px, -8.25px);
+  }
+  15% {
+    transform: translate(8.36px, 8.25px) rotate(0.628rad) scaleX(0.429) scaleY(0.429) translate(-8.36px, -8.25px);
+  }
+  16.67% {
+    transform: translate(8.36px, 8.25px) rotate(0.698rad) scaleX(0.512) scaleY(0.512) translate(-8.36px, -8.25px);
+  }
+  18.33% {
+    transform: translate(8.36px, 8.25px) rotate(0.768rad) scaleX(0.599) scaleY(0.599) translate(-8.36px, -8.25px);
+  }
+  20% {
+    transform: translate(8.36px, 8.25px) rotate(0.838rad) scaleX(0.692) scaleY(0.692) translate(-8.36px, -8.25px);
+  }
+  21.67% {
+    transform: translate(8.36px, 8.25px) rotate(0.908rad) scaleX(0.789) scaleY(0.789) translate(-8.36px, -8.25px);
+  }
+  23.33% {
+    transform: translate(8.36px, 8.25px) rotate(0.977rad) scaleX(0.891) scaleY(0.891) translate(-8.36px, -8.25px);
+  }
+  25% {
+    transform: translate(8.36px, 8.25px) rotate(1.047rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  26.67% {
+    transform: translate(8.36px, 8.25px) rotate(1.117rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  28.33% {
+    transform: translate(8.36px, 8.25px) rotate(1.187rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  30% {
+    transform: translate(8.36px, 8.25px) rotate(1.257rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  31.67% {
+    transform: translate(8.36px, 8.25px) rotate(1.327rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  33.33% {
+    transform: translate(8.36px, 8.25px) rotate(1.396rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  35% {
+    transform: translate(8.36px, 8.25px) rotate(1.466rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  36.67% {
+    transform: translate(8.36px, 8.25px) rotate(1.536rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  38.33% {
+    transform: translate(8.36px, 8.25px) rotate(1.606rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  40% {
+    transform: translate(8.36px, 8.25px) rotate(1.676rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  41.67% {
+    transform: translate(8.36px, 8.25px) rotate(1.746rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  43.33% {
+    transform: translate(8.36px, 8.25px) rotate(1.815rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  45% {
+    transform: translate(8.36px, 8.25px) rotate(1.885rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  46.67% {
+    transform: translate(8.36px, 8.25px) rotate(1.955rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  48.33% {
+    transform: translate(8.36px, 8.25px) rotate(2.025rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  50% {
+    transform: translate(8.36px, 8.25px) rotate(2.095rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  51.67% {
+    transform: translate(8.36px, 8.25px) rotate(2.164rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  53.33% {
+    transform: translate(8.36px, 8.25px) rotate(2.234rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  55% {
+    transform: translate(8.36px, 8.25px) rotate(2.304rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  56.67% {
+    transform: translate(8.36px, 8.25px) rotate(2.374rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  58.33% {
+    transform: translate(8.36px, 8.25px) rotate(2.443rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  60% {
+    transform: translate(8.36px, 8.25px) rotate(2.513rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  61.67% {
+    transform: translate(8.36px, 8.25px) rotate(2.583rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  63.33% {
+    transform: translate(8.36px, 8.25px) rotate(2.653rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  65% {
+    transform: translate(8.36px, 8.25px) rotate(2.723rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  66.67% {
+    transform: translate(8.36px, 8.25px) rotate(2.793rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  68.33% {
+    transform: translate(8.36px, 8.25px) rotate(2.862rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  70% {
+    transform: translate(8.36px, 8.25px) rotate(2.932rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  71.67% {
+    transform: translate(8.36px, 8.25px) rotate(3.002rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  73.33% {
+    transform: translate(8.36px, 8.25px) rotate(3.072rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  75% {
+    transform: translate(8.36px, 8.25px) rotate(3.142rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  76.67% {
+    transform: translate(8.36px, 8.25px) rotate(3.211rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  78.33% {
+    transform: translate(8.36px, 8.25px) rotate(3.281rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  80% {
+    transform: translate(8.36px, 8.25px) rotate(3.351rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  81.67% {
+    transform: translate(8.36px, 8.25px) rotate(3.421rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  83.33% {
+    transform: translate(8.36px, 8.25px) rotate(3.491rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  85% {
+    transform: translate(8.36px, 8.25px) rotate(3.56rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  86.67% {
+    transform: translate(8.36px, 8.25px) rotate(3.63rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  88.33% {
+    transform: translate(8.36px, 8.25px) rotate(3.7rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  90% {
+    transform: translate(8.36px, 8.25px) rotate(3.77rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  91.67% {
+    transform: translate(8.36px, 8.25px) rotate(3.84rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  93.33% {
+    transform: translate(8.36px, 8.25px) rotate(3.91rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  95% {
+    transform: translate(8.36px, 8.25px) rotate(3.979rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  96.67% {
+    transform: translate(8.36px, 8.25px) rotate(4.05rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  98.33% {
+    transform: translate(8.36px, 8.25px) rotate(4.119rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+  100% {
+    transform: translate(8.36px, 8.25px) rotate(4.189rad) scaleX(1) scaleY(1) translate(-8.36px, -8.25px);
+  }
+}
+@keyframes kf_logo-mark_opacity_0 {
+  0% {
+    animation-timing-function: ease-in;
+    opacity: 0;
+  }
+  5% {
+    animation-timing-function: linear;
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+#logo-mark {
+  transform-origin: 0 0;
+  animation:
+    kf_logo-mark_transform_0 2s linear infinite,
+    kf_logo-mark_opacity_0 2s linear infinite;
+}
+</style>
+<g id="idat_logo">
+<g id="logo-mark" clip-path="url(#clip0_158_244)">
+<g id="icon-source" transform="translate(0 -0.5)">
+<path d="M14.8893 0.5C11.2827 0.5 8.3589 3.3857 8.3589 6.94531V0.5H0V2.30469C0 5.86431 2.92379 8.75 6.53039 8.75H0V17H1.82851C5.43512 17 8.3589 14.1143 8.3589 10.5547V17H16.7178V15.1953C16.7178 11.6357 13.794 8.75 10.1874 8.75H16.7178V0.5H14.8893Z" id="icon-source_bg_0" fill="#2563EB">
+</path>
+</g>
+</g>
+<g id="idat_" transform="translate(21.72 0.24)">
+<path d="M0.02 3.1V0.92H2.2V3.1H0.02ZM0 16V5.3H2.24V16H0Z" id="idat__bg_0" fill="#101010">
+</path>
+<path d="M11.2591 16C10.4857 15.9867 9.70573 15.9 8.91906 15.74C8.1324 15.58 7.41906 15.3 6.77906 14.9C6.13906 14.4867 5.61906 13.9133 5.21906 13.18C4.8324 12.4467 4.63906 11.5067 4.63906 10.36V5.3H11.6191V0H13.8591V16H11.2591ZM11.3591 13.94H11.6191V7.34H6.83906V10.34C6.83906 11.14 6.98573 11.78 7.27906 12.26C7.58573 12.7267 7.9724 13.08 8.43906 13.32C8.90573 13.5467 9.39906 13.7067 9.91906 13.8C10.4391 13.88 10.9191 13.9267 11.3591 13.94Z" fill="#101010"/>
+<path d="M25.0002 10.9V16H15.9002C15.8068 14.6933 15.8735 13.6133 16.1002 12.76C16.3402 11.9067 16.6868 11.2267 17.1402 10.72C17.6068 10.2133 18.1335 9.84 18.7202 9.6C19.3068 9.34667 19.9135 9.18 20.5402 9.1C21.1668 9.02 21.7602 8.98 22.3202 8.98C22.0268 8.51333 21.6468 8.16667 21.1802 7.94C20.7135 7.7 20.2202 7.54 19.7002 7.46C19.1935 7.38 18.7202 7.33333 18.2802 7.32H16.4202V5.26H18.3802C19.1668 5.27333 19.9468 5.36 20.7202 5.52C21.5068 5.68 22.2202 5.96667 22.8602 6.38C23.5002 6.78 24.0135 7.34667 24.4002 8.08C24.8002 8.81333 25.0002 9.75333 25.0002 10.9ZM18.1002 13.96H22.8002V10.94C21.1335 10.9533 19.9335 11.1733 19.2002 11.6C18.4668 12.0267 18.1002 12.8133 18.1002 13.96Z" fill="#101010"/>
+<path d="M32.4298 16.02C31.9898 16.02 31.5165 15.9333 31.0098 15.76C30.5165 15.5867 30.0432 15.2933 29.5898 14.88C29.1498 14.4533 28.7832 13.88 28.4898 13.16C28.2098 12.4267 28.0698 11.5133 28.0698 10.42V7.36H26.0898V5.3H28.0698V2H30.2698V5.3H32.4298V7.36H30.2698V10.42C30.2832 11.2067 30.3698 11.8267 30.5298 12.28C30.6898 12.72 30.8832 13.0533 31.1098 13.28C31.3365 13.4933 31.5698 13.6333 31.8098 13.7C32.0498 13.7667 32.2565 13.8133 32.4298 13.84V16.02Z" fill="#101010"/>
+<path d="M33.6383 15.98V13.3H36.3183V15.98H33.6383Z" fill="#2563EB"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_158_244">
+<rect width="16.72" height="16.5" fill="white"/>
+</clipPath>
+</defs>
+</svg>

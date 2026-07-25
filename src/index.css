@@ -1,0 +1,210 @@
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/cascadia-mono/400.css";
+@import "@fontsource/cascadia-mono/500.css";
+
+@import "tailwindcss";
+
+* {
+  letter-spacing: 0 !important;
+}
+
+html, body {
+  background-color: #F2F1F3 !important;
+  color: #545454 !important;
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: 0 !important;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Light Sweep Shimmer Animation */
+@keyframes lightSweep {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+  }
+  25% {
+    transform: translateX(250%) skewX(-25deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-25deg);
+  }
+}
+
+/* Scaled Down Global Typography (80% scale) */
+.text-mono-20 {
+  color: #545454 !important;
+  font-size: 16px !important;
+  font-family: 'Cascadia Mono', monospace !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+.text-inter-20 {
+  color: #545454 !important;
+  font-size: 16px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+.text-inter-16 {
+  color: #545454 !important;
+  font-size: 13px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+.text-inter-14 {
+  color: #545454 !important;
+  font-size: 11.5px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+.text-mono-10 {
+  color: #545454 !important;
+  font-size: 8.5px !important;
+  font-family: 'Cascadia Mono', monospace !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Global Badges & Pills (80% Scaled) */
+.badge-unclaimed {
+  background: #E9E9E9 !important;
+  padding: 3px 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #545454 !important;
+  font-size: 8.5px !important;
+  font-family: 'Cascadia Mono', monospace !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+.tool-pill {
+  background: #E9E9E9 !important;
+  padding: 3px 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  color: #545454 !important;
+  font-size: 8.5px !important;
+  font-family: 'Cascadia Mono', monospace !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Scaled Search Pill with Search Icon Before Placeholder & Interactive Focus */
+.pill-search {
+  background: #e5e5e5 !important;
+  border-radius: 24px !important;
+  height: 38px !important;
+  width: 100% !important;
+  border: 1px solid transparent !important;
+  outline: none !important;
+  padding-left: 34px !important;
+  padding-right: 14px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  color: #101010 !important;
+  letter-spacing: 0 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.pill-search::placeholder {
+  color: #545454 !important;
+  font-size: 13px !important;
+  opacity: 0.75 !important;
+}
+
+.pill-search:hover {
+  background: #dedede !important;
+}
+
+.pill-search:focus {
+  background: #ffffff !important;
+  border-color: rgba(16, 16, 16, 0.2) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Main Global Button with Periodic Light Sweep Flash Animation */
+.btn-main {
+  position: relative !important;
+  overflow: hidden !important;
+  background-color: #101010 !important;
+  color: #ffffff !important;
+  border-radius: 9999px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  padding: 5px 13px !important;
+  border: none !important;
+  outline: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  letter-spacing: 0 !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.btn-main:hover {
+  opacity: 0.88 !important;
+}
+
+/* Clean text filter control (NOT a button) */
+.filter-text-select {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  color: #545454 !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+}
+
+/* Scaled Avatar Circle with Luxury Gradient Background */
+.avatar-circle {
+  width: 32px !important;
+  height: 32px !important;
+  background: linear-gradient(135deg, #101010 0%, #3a3a3a 50%, #545454 100%) !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Cascadia Mono', monospace !important;
+  font-size: 10px !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  transition: transform 0.15s ease, opacity 0.15s ease !important;
+}
+
+.avatar-circle:hover {
+  transform: scale(1.04) !important;
+  opacity: 0.95 !important;
+}
+
+.builder-avatar-sm {
+  width: 16px !important;
+  height: 16px !important;
+  background: linear-gradient(135deg, #2a2a2a 0%, #545454 100%) !important;
+  border-radius: 9999px !important;
+  outline: 1.2px #F2F1F3 solid !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+}
+
+.grey-block {
+  background: #D9D9D9 !important;
+  width: 100% !important;
+}
