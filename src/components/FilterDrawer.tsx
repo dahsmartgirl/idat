@@ -54,9 +54,22 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 }) => {
   const [draftFilters, setDraftFilters] = React.useState<FilterState>(filters);
 
+  // Synchronize draft state when drawer opens
   React.useEffect(() => {
     setDraftFilters(filters);
   }, [filters, isOpen]);
+
+  // Lock body scroll when drawer is open
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const toggleTool = (toolId: string) => {
     setDraftFilters((prev) => {
@@ -107,6 +120,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
     };
     setDraftFilters(emptyFilters);
     onApplyFilters(emptyFilters);
+    onClose();
   };
 
   const handleApply = () => {
@@ -135,7 +149,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
             className="fixed inset-0 bg-black/20 backdrop-blur-[4px]"
           />
 
-          {/* Drawer Body - Seamless with fast-fading X button on exit */}
+          {/* Drawer Body - Accommodates Glassmorphic Blurred X button */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -152,17 +166,17 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
             className="relative w-[calc(100vw-64px)] sm:w-[370px] max-w-[370px] h-full bg-[#F2F1F3] shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
           >
             
-            {/* BIG Floating White X Button: Fades out instantly (0.12s) on exit so it NEVER lingers */}
+            {/* Glassmorphic Blurred Floating X Button with WHITE X icon inside */}
             <motion.button
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
               transition={{ duration: 0.12 }}
               onClick={onClose}
-              className="absolute -left-13 top-5 sm:-left-16 sm:top-6 flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-white text-[#101010] rounded-full shadow-2xl hover:scale-110 transition-transform cursor-pointer border border-[#E9E9E9] z-50"
+              className="absolute -left-13 top-5 sm:-left-16 sm:top-6 flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-white/40 backdrop-blur-md text-white rounded-full shadow-xl hover:bg-white/60 hover:scale-110 transition-all cursor-pointer border border-white/60 z-50"
               title="Close filter drawer"
             >
-              <X className="w-5 h-5 stroke-[2.2]" />
+              <X className="w-5 h-5 stroke-[2.2] text-white" />
             </motion.button>
 
             {/* Drawer Header */}
@@ -178,23 +192,23 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                 )}
               </div>
 
-              {/* Right Controls */}
+              {/* Right Controls: reset all (btn-secondary) + apply (btn-main) */}
               <div className="flex items-center gap-1.5 sm:gap-2">
                 
                 {/* reset all button */}
                 <button
                   onClick={handleReset}
-                  className="h-[27px] px-3 rounded-full bg-[#E9E9E9] text-[#101010] hover:bg-[#E0E0E0] transition-colors flex items-center gap-1 font-sans text-[11.5px] font-medium cursor-pointer"
+                  className="btn-secondary flex items-center gap-1"
                   title="Reset all filters"
                 >
-                  <RotateCcw className="w-3 h-3" />
+                  <RotateCcw className="w-3 h-3 text-[#101010]" />
                   <span>reset all</span>
                 </button>
 
                 {/* apply filters button */}
                 <button
                   onClick={handleApply}
-                  className="btn-main relative overflow-hidden flex items-center justify-center gap-1 !h-[27px] !px-3 font-sans text-[11.5px] font-medium"
+                  className="btn-main relative overflow-hidden flex items-center justify-center gap-1"
                   title="Apply filters"
                 >
                   <motion.div

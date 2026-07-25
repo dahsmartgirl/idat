@@ -64,16 +64,16 @@ export const ToolFilterBar: React.FC<ToolFilterBarProps> = ({
         </span>
       </div>
 
-      {/* Redesigned Filter Button: Right-aligned, Filter Icon + filter text */}
+      {/* Redesigned Filter Button matching +new button height (27px), font-weight (500), font-size (11.5px), padding (0 13px) */}
       <button
         onClick={onOpenFilterDrawer}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#E9E9E9] text-[#101010] hover:bg-[#E0E0E0] transition-all font-sans text-xs font-medium cursor-pointer"
+        className="btn-secondary flex items-center gap-1 group"
         title="Open filters"
       >
-        <SlidersHorizontal className="w-3.5 h-3.5 stroke-[2]" />
+        <SlidersHorizontal className="w-3 h-3 stroke-[2] text-[#101010]" />
         <span>filter</span>
         {activeFilterCount > 0 && (
-          <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#101010] text-white text-[9px] font-mono">
+          <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#101010] text-white text-[9px] font-mono font-bold">
             {activeFilterCount}
           </span>
         )}
