@@ -183,10 +183,22 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
             {/* User Info Column */}
             <div className="space-y-1 sm:space-y-1.5 min-w-0 flex-1">
               
-              {/* @username: Blue shade #0011FF */}
-              <h1 className="font-mono text-[15px] sm:text-[16px] !text-[#0011FF] font-medium tracking-normal truncate">
-                @{builder.username}
-              </h1>
+              {/* @username: Blue shade #0011FF + Micro Founding Badge SVG (10px / 11.5px) */}
+              <div className="flex items-center gap-1 flex-wrap min-w-0">
+                <h1 className="font-mono text-[15px] sm:text-[16px] !text-[#0011FF] font-medium tracking-normal truncate">
+                  @{builder.username}
+                </h1>
+
+                {/* Ultra Micro Founding Badge SVG beside username */}
+                {(builder.isFoundingBuilder || (builder.foundingNumber && builder.foundingNumber <= 500)) && (
+                  <img
+                    src="/founding badge.svg"
+                    alt="Founding Builder Badge"
+                    className="w-[10px] h-[10px] sm:w-[11.5px] sm:h-[11.5px] shrink-0 inline-block align-middle"
+                    title={`Founding Builder #${builder.foundingNumber || 42}`}
+                  />
+                )}
+              </div>
 
               {/* builder #42: Number touches # directly (gap removed), number in #0011FF */}
               <div className="text-inter-14 !text-[#545454] flex items-baseline">

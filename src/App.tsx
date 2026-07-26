@@ -110,6 +110,15 @@ function AppLayout() {
     }
   };
 
+  const renderProfilePage = () => (
+    <BuilderProfilePage
+      searchQuery={searchQuery}
+      onSelectProject={(proj) => setActiveProject(proj)}
+      onOpenClaim={handleOpenClaim}
+      onSelectBuilder={handleSelectBuilder}
+    />
+  );
+
   return (
     <div className="min-h-screen bg-[#F2F1F3] text-[#545454] flex flex-col font-sans w-full overflow-x-hidden relative">
       
@@ -166,18 +175,10 @@ function AppLayout() {
               }
             />
 
-            {/* Direct Profile Route domain/username (e.g. domain/ileri) */}
-            <Route
-              path="/:username"
-              element={
-                <BuilderProfilePage
-                  searchQuery={searchQuery}
-                  onSelectProject={(proj) => setActiveProject(proj)}
-                  onOpenClaim={handleOpenClaim}
-                  onSelectBuilder={handleSelectBuilder}
-                />
-              }
-            />
+            {/* Profile Route variations: /b/:username, /builder/:username, /:username */}
+            <Route path="/b/:username" element={renderProfilePage()} />
+            <Route path="/builder/:username" element={renderProfilePage()} />
+            <Route path="/:username" element={renderProfilePage()} />
           </Routes>
         </main>
       </motion.div>
