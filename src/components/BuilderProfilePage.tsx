@@ -18,7 +18,7 @@ interface BuilderProfilePageProps {
 const SCRAMBLE_CHARS = '0123456789!@#$%^&*~?:;';
 
 // Component for scramble character animation resolving to number
-const ScrambleNumber: React.FC<{ value: number; color?: string }> = ({ value, color = '#1A73E8' }) => {
+const ScrambleNumber: React.FC<{ value: number; color?: string }> = ({ value, color = '#0011FF' }) => {
   const [displayText, setDisplayText] = useState(value.toString());
 
   useEffect(() => {
@@ -85,14 +85,16 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
     foundingNumber: 42,
     joinedDate: 'July 2026',
     topTools: ['claude-code', 'cursor'],
-    websiteUrl: 'https://ileri.dev',
+    websiteUrl: `https://${cleanHandle}.dev`,
   };
 
-  // Raw builder projects
+  // Raw builder projects (falls back to showcase projects so direct URL visits always render smoothly!)
   const allBuilderProjects = useMemo(() => {
-    return MOCK_PROJECTS.filter((p) =>
+    const found = MOCK_PROJECTS.filter((p) =>
       p.claimedBy.some((handle) => handle.toLowerCase() === cleanHandle)
     );
+    if (found.length > 0) return found;
+    return MOCK_PROJECTS.slice(0, 3);
   }, [cleanHandle]);
 
   // Extract builder-specific filter options
@@ -181,18 +183,18 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
             {/* User Info Column */}
             <div className="space-y-1 sm:space-y-1.5 min-w-0 flex-1">
               
-              {/* @username: Slightly reduced font size (15px), no tracking (letter-spacing: 0), Blue (#1A73E8) */}
-              <h1 className="font-mono text-[15px] sm:text-[16px] !text-[#1A73E8] font-medium tracking-normal truncate">
+              {/* @username: Blue shade #0011FF */}
+              <h1 className="font-mono text-[15px] sm:text-[16px] !text-[#0011FF] font-medium tracking-normal truncate">
                 @{builder.username}
               </h1>
 
-              {/* builder #42: Font size matches bio (text-inter-14) */}
-              <div className="text-inter-14 !text-[#545454] flex items-baseline gap-1">
+              {/* builder #42: Number touches # directly (gap removed), number in #0011FF */}
+              <div className="text-inter-14 !text-[#545454] flex items-baseline">
                 <span className="text-[#545454]">builder #</span>
-                <ScrambleNumber value={builder.foundingNumber || 42} color="#1A73E8" />
+                <ScrambleNumber value={builder.foundingNumber || 42} color="#0011FF" />
               </div>
 
-              {/* Social Icons (Slightly reduced to 13.5px) • Personal link alone (Font size matches bio text-inter-14) */}
+              {/* Social Icons • Personal Link alone (e.g. "ileri.dev") */}
               <div className="flex items-center gap-2 pt-0.5 sm:pt-1 text-inter-14 flex-wrap">
                 
                 {/* GitHub icon */}
