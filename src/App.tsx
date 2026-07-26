@@ -20,6 +20,19 @@ function AppLayout() {
   const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Track window width for pixel-exact mobile & desktop push content calculations
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Rich Filter state for home grid
   const [filters, setFilters] = useState<FilterState>({
     aiTools: [],
@@ -133,18 +146,32 @@ function AppLayout() {
     />
   );
 
-  // Content push offset calculation (-540 when Project view is open, -370 when Filter drawer is open)
-  const pushX = activeProject ? -540 : (isFilterDrawerOpen ? -370 : 0);
+  // Exact push offset calculation for both mobile (leaves 64px left gap) & desktop (-540 / -370)
+  const pushX = useMemo(() => {
+    const isMobile = windowWidth < 640;
+    const mobileOffset = -(windowWidth - 64);
+
+    if (activeProject) {
+      return isMobile ? mobileOffset : -540;
+    }
+    if (isFilterDrawerOpen) {
+      return isMobile ? mobileOffset : -370;
+    }
+    if (isFavoritesOpen) {
+      return isMobile ? mobileOffset : -370;
+    }
+    return 0;
+  }, [activeProject, isFilterDrawerOpen, isFavoritesOpen, windowWidth]);
 
   return (
     <div className="min-h-screen bg-[#F2F1F3] text-[#545454] flex flex-col font-sans w-full overflow-x-hidden relative">
       
-      {/* Main Page Content Wrapper (Pushed out to the left when Drawer is Open) */}
+      {/* Main Page Content Wrapper (Smoothly pushed left for both mobile & desktop drawers) */}
       <motion.div
         animate={{
           x: pushX,
         }}
-        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
         className="flex-1 flex flex-col w-full"
       >
         {/* PERSISTENT HEADER across all routes */}
@@ -159,60 +186,38 @@ function AppLayout() {
           onOpenProfile={() => handleSelectBuilder('ileri')}
         />
 
-        {/* Dynamic Main Body Content via Router */}
-        <main className="flex-1 w-full py-2">
-          <Routes>
-            {/* Main Archive Grid */}
-            <Route
-              path="/"
-              element={
-                <>
-                  <ToolFilterBar
-                    onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
-                    activeFilterCount={activeFilterCount}
-                  />
+        {/* ROUTED CONTENT */}
+        <Routes>
+          {/* HOME PAGE ROUTE */}
+          <Route
+            path="/"
+            element={
+              <main className="flex-1 flex flex-col w-full pb-16 sm:pb-24">
+                {/* TOOL FILTER CHIPS BAR WITH INTEGRATED COUNTERS & EXPANDABLE DRAWER TRIGGER */}
+                <ToolFilterBar
+                  onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
+                  activeFilterCount={activeFilterCount}
+                />
 
+                {/* MASONRY PROJECT GRID */}
+                <div className="w-full pt-4">
                   <ProjectMasonry
                     projects={filteredProjects}
-                    searchQuery={searchQuery}
-                    onClearSearch={() => {
-                      setSearchQuery('');
-                      setFilters({
-                        aiTools: [],
-                        categories: [],
-                        aiModels: [],
-                        status: 'all',
-                      });
-                    }}
                     onSelectProject={(proj) => setActiveProject(proj)}
                     onOpenClaim={handleOpenClaim}
                     onSelectBuilder={handleSelectBuilder}
                   />
-                </>
-              }
-            />
+                </div>
+              </main>
+            }
+          />
 
-            {/* Profile Route variations: /b/:username, /builder/:username, /:username */}
-            <Route path="/b/:username" element={renderProfilePage()} />
-            <Route path="/builder/:username" element={renderProfilePage()} />
-            <Route path="/:username" element={renderProfilePage()} />
-            
-            {/* Fallback route to prevent any 404s */}
-            <Route path="*" element={renderProfilePage()} />
-          </Routes>
-        </main>
+          {/* BUILDER PROFILE DIRECT ROUTE */}
+          <Route path="/:builderHandle" element={renderProfilePage()} />
+        </Routes>
       </motion.div>
 
-      {/* Main Home Filter Side Drawer */}
-      <FilterDrawer
-        isOpen={isFilterDrawerOpen}
-        onClose={() => setIsFilterDrawerOpen(false)}
-        filters={filters}
-        onApplyFilters={(newFilters) => setFilters(newFilters)}
-        totalFilteredCount={filteredProjects.length}
-      />
-
-      {/* Drawers & Modals */}
+      {/* PROJECT DETAILS SIDE DRAWER */}
       <ProjectDrawer
         project={activeProject}
         onClose={() => setActiveProject(null)}
@@ -220,6 +225,27 @@ function AppLayout() {
         onOpenClaim={handleOpenClaim}
       />
 
+      {/* FILTER EXPANDABLE SIDE DRAWER */}
+      <FilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        filters={filters}
+        onApplyFilters={(updatedFilters) => setFilters(updatedFilters)}
+        totalFilteredCount={filteredProjects.length}
+      />
+
+      {/* FAVORITES / BOOKMARKS SIDE DRAWER */}
+      <FavoritesDrawer
+        isOpen={isFavoritesOpen}
+        onClose={() => setIsFavoritesOpen(false)}
+        allProjects={projects}
+        onSelectProject={(proj) => {
+          setIsFavoritesOpen(false);
+          setActiveProject(proj);
+        }}
+      />
+
+      {/* SUBMIT / CLAIM MODAL */}
       <SubmitModal
         isOpen={isSubmitOpen}
         onClose={() => {
@@ -230,22 +256,16 @@ function AppLayout() {
         claimingProject={claimingProject}
       />
 
-      <FavoritesDrawer
-        isOpen={isFavoritesOpen}
-        onClose={() => setIsFavoritesOpen(false)}
-        allProjects={projects}
-        onSelectProject={(p) => setActiveProject(p)}
-      />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <FavoritesProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <FavoritesProvider>
         <AppLayout />
-      </BrowserRouter>
-    </FavoritesProvider>
+      </FavoritesProvider>
+    </BrowserRouter>
   );
 }

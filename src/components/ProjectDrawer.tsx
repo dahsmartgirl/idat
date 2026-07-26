@@ -99,7 +99,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
             onClick={onClose}
             className="fixed inset-0 bg-black/20 backdrop-blur-[4px]"
           />
@@ -109,7 +109,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={{ left: 0, right: 0.7 }}
