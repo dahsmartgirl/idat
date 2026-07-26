@@ -134,16 +134,16 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               <X className="w-5 h-5 stroke-[2.2]" />
             </motion.button>
 
-            {/* 1. Full Drawer Width Sticky Unclaimed Banner (Fixed at top of drawer) */}
+            {/* 1. Full Drawer Width Sticky Unclaimed Banner (Lighter font-normal typography) */}
             {!project.isClaimed && (
               <div 
                 onClick={() => onOpenClaim(project)}
                 className="w-full bg-[#101010] py-2.5 px-6 sm:px-8 flex items-center justify-between cursor-pointer rounded-none group shrink-0 z-40"
               >
-                <span className="font-sans text-[11.5px] font-medium text-white/90 leading-none">
+                <span className="font-sans text-[11.5px] font-normal text-white/90 leading-none">
                   Is this your thing?
                 </span>
-                <div className="flex items-center gap-1 font-sans text-[11.5px] font-medium text-white/90 leading-none">
+                <div className="flex items-center gap-1 font-sans text-[11.5px] font-normal text-white/90 leading-none">
                   <span className="leading-none">claim</span>
                   <ArrowRight className="w-3.5 h-3.5 shrink-0 text-white/90 group-hover:translate-x-0.5 transition-transform duration-200" />
                 </div>
