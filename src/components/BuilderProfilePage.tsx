@@ -13,6 +13,7 @@ interface BuilderProfilePageProps {
   onOpenClaim: (project: Project) => void;
   onSelectBuilder: (handle: string) => void;
   searchQuery?: string;
+  activeProject?: Project | null;
 }
 
 const SCRAMBLE_CHARS = '0123456789!@#$%^&*~?:;';
@@ -63,6 +64,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
   onOpenClaim,
   onSelectBuilder,
   searchQuery = '',
+  activeProject = null,
 }) => {
   const { username } = useParams<{ username: string }>();
   const cleanHandle = (username || 'ileri').replace('@', '').toLowerCase();
@@ -159,13 +161,15 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
     filters.categories.length +
     filters.aiModels.length;
 
+  const profilePushX = activeProject ? -540 : (isFilterDrawerOpen ? -370 : 0);
+
   return (
     <div className="w-full relative">
       
-      {/* Sliding Content Container (Pushed out to the left when Filter Side Drawer is Open) */}
+      {/* Sliding Content Container (Pushed out to the left when Filter Side Drawer or Project Drawer is Open) */}
       <motion.div
         animate={{
-          x: isFilterDrawerOpen ? -380 : 0,
+          x: profilePushX,
         }}
         transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
         className="w-full flex flex-col space-y-6"
@@ -183,7 +187,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
             {/* User Info Column */}
             <div className="space-y-1 sm:space-y-1.5 min-w-0 flex-1">
               
-              {/* @username: Blue shade #0011FF + Micro Founding Badge SVG (10px / 11.5px) */}
+              {/* @username: Blue shade #0011FF + Micro Founding Badge SVG */}
               <div className="flex items-center gap-1 flex-wrap min-w-0">
                 <h1 className="font-mono text-[15px] sm:text-[16px] !text-[#0011FF] font-medium tracking-normal truncate">
                   @{builder.username}

@@ -43,18 +43,22 @@ export interface Project {
   aiTools: string[];
   aiModel?: string;
   category: CategoryType;
-  tags: string[];
-  techStack: string[];
-  coverImage: string;
-  screenshots: string[];
+  upvotesCount?: number;
+  featuredOrder?: number;
+  submittedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
   demoUrl?: string;
   githubUrl?: string;
-  remixUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-  buildNotes: BuildNotes;
+  youtubeUrl?: string;
+  xPostUrl?: string;
+  coverImage?: string;
+  screenshots?: string[];
+  techStack?: string[];
   timeline: TimelineMilestone[];
-  isFavorite?: boolean;
+  buildNotes: BuildNotes;
+  perks?: string[];
+  tags: string[];
 }
 
 export interface Builder {
@@ -62,15 +66,16 @@ export interface Builder {
   username: string;
   displayName: string;
   role: string;
-  avatarUrl: string;
   bio: string;
+  avatarUrl?: string;
   isFoundingBuilder: boolean;
   foundingNumber?: number;
   joinedDate: string;
+  topTools: string[];
   websiteUrl?: string;
   githubUrl?: string;
+  twitterUrl?: string;
   xUrl?: string;
-  topTools: string[];
 }
 
 export interface FilterState {

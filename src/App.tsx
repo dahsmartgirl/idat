@@ -129,16 +129,20 @@ function AppLayout() {
       onSelectProject={(proj) => setActiveProject(proj)}
       onOpenClaim={handleOpenClaim}
       onSelectBuilder={handleSelectBuilder}
+      activeProject={activeProject}
     />
   );
+
+  // Content push offset calculation (-540 when Project view is open, -370 when Filter drawer is open)
+  const pushX = activeProject ? -540 : (isFilterDrawerOpen ? -370 : 0);
 
   return (
     <div className="min-h-screen bg-[#F2F1F3] text-[#545454] flex flex-col font-sans w-full overflow-x-hidden relative">
       
-      {/* Main Page Content Wrapper (Pushed out to the left when Filter Side Drawer is Open) */}
+      {/* Main Page Content Wrapper (Pushed out to the left when Drawer is Open) */}
       <motion.div
         animate={{
-          x: isFilterDrawerOpen ? -380 : 0,
+          x: pushX,
         }}
         transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
         className="flex-1 flex flex-col w-full"
