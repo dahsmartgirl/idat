@@ -134,24 +134,24 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               <X className="w-5 h-5 stroke-[2.2]" />
             </motion.button>
 
-            {/* Single Scrollable Content Body (Only drawer scrolls, banner scrolls with content) */}
-            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5">
-
-              {/* 1. Full Drawer Width Unclaimed Banner (Non-sticky: scrolls with content, lighter font-normal, no sweeping animation) */}
-              {!project.isClaimed && (
-                <div 
-                  onClick={() => onOpenClaim(project)}
-                  className="-mt-6 -mx-6 sm:-mt-8 sm:-mx-8 mb-5 bg-[#101010] text-white py-2.5 px-6 sm:px-8 flex items-center justify-between cursor-pointer rounded-none group"
-                >
-                  <span className="font-sans text-[12px] font-normal text-white leading-none">
-                    Is this your thing?
-                  </span>
-                  <div className="flex items-center gap-1 font-sans text-[12px] text-white font-normal leading-none">
-                    <span className="leading-none">claim</span>
-                    <ArrowRight className="w-3.5 h-3.5 shrink-0 group-hover:translate-x-0.5 transition-transform duration-200" />
-                  </div>
+            {/* 1. Full Drawer Width Sticky Unclaimed Banner (Fixed at top of drawer) */}
+            {!project.isClaimed && (
+              <div 
+                onClick={() => onOpenClaim(project)}
+                className="w-full bg-[#101010] py-2.5 px-6 sm:px-8 flex items-center justify-between cursor-pointer rounded-none group shrink-0 z-40"
+              >
+                <span className="font-sans text-[11.5px] font-medium text-white/90 leading-none">
+                  Is this your thing?
+                </span>
+                <div className="flex items-center gap-1 font-sans text-[11.5px] font-medium text-white/90 leading-none">
+                  <span className="leading-none">claim</span>
+                  <ArrowRight className="w-3.5 h-3.5 shrink-0 text-white/90 group-hover:translate-x-0.5 transition-transform duration-200" />
                 </div>
-              )}
+              </div>
+            )}
+
+            {/* Single Scrollable Content Body (Only drawer content scrolls below sticky banner) */}
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5">
 
               {/* Grouped Top Block: Expand Icon on LEFT, Action Icons on RIGHT, then Title, Description, and Owner Tag */}
               <div className="space-y-1.5">
@@ -227,7 +227,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   </p>
                 )}
 
-                {/* Owner Tag (Pill style, Username in #0011FF Blue!) */}
+                {/* Owner Tag (Pill style: 'unclaimed' when project is not claimed) */}
                 <div className="pt-1">
                   {project.isClaimed ? (
                     <button
@@ -250,7 +250,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1"
                       title="Claim this project"
                     >
-                      <span className="text-mono-10 !text-[#545454]">unclaimed (claim)</span>
+                      <span className="text-mono-10 !text-[#545454]">unclaimed</span>
                     </button>
                   )}
                 </div>
