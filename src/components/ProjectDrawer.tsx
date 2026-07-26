@@ -5,6 +5,7 @@ import { ToolLogo } from './ToolLogos';
 import { 
   X, 
   ArrowUpRight, 
+  ArrowRight,
   Bookmark, 
   GitFork, 
   Copy, 
@@ -133,22 +134,24 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               <X className="w-5 h-5 stroke-[2.2]" />
             </motion.button>
 
-            {/* 1. Full Drawer Width Unclaimed Banner (Aligned to top with ZERO spacing) */}
-            {!project.isClaimed && (
-              <div 
-                onClick={() => onOpenClaim(project)}
-                className="w-full bg-[#101010] text-white py-2.5 px-6 flex items-center justify-between cursor-pointer hover:opacity-95 transition-opacity shrink-0 rounded-none"
-              >
-                <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 fill-white text-white shrink-0" />
-                  <span className="text-mono-10 !text-white font-medium">Is this your thing?</span>
-                </div>
-                <span className="text-mono-10 !text-white underline font-semibold">claim &rarr;</span>
-              </div>
-            )}
-
-            {/* Single Scrollable Content Body (Only drawer scrolls) */}
+            {/* Single Scrollable Content Body (Only drawer scrolls, banner scrolls with content) */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5">
+
+              {/* 1. Full Drawer Width Unclaimed Banner (Non-sticky: scrolls with content, lighter font-normal, no sweeping animation) */}
+              {!project.isClaimed && (
+                <div 
+                  onClick={() => onOpenClaim(project)}
+                  className="-mt-6 -mx-6 sm:-mt-8 sm:-mx-8 mb-5 bg-[#101010] text-white py-2.5 px-6 sm:px-8 flex items-center justify-between cursor-pointer rounded-none group"
+                >
+                  <span className="font-sans text-[12px] font-normal text-white leading-none">
+                    Is this your thing?
+                  </span>
+                  <div className="flex items-center gap-1 font-sans text-[12px] text-white font-normal leading-none">
+                    <span className="leading-none">claim</span>
+                    <ArrowRight className="w-3.5 h-3.5 shrink-0 group-hover:translate-x-0.5 transition-transform duration-200" />
+                  </div>
+                </div>
+              )}
 
               {/* Grouped Top Block: Expand Icon on LEFT, Action Icons on RIGHT, then Title, Description, and Owner Tag */}
               <div className="space-y-1.5">
