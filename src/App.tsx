@@ -121,6 +121,12 @@ function AppLayout() {
     setIsSubmitOpen(true);
   };
 
+  const handleSelectProject = (project: Project) => {
+    setIsFilterDrawerOpen(false);
+    setIsFavoritesOpen(false);
+    setActiveProject(project);
+  };
+
   const handleAddProject = (newProjectData: Partial<Project>) => {
     if (claimingProject) {
       setProjects((prev) =>
@@ -139,7 +145,7 @@ function AppLayout() {
   const renderProfilePage = () => (
     <BuilderProfilePage
       searchQuery={searchQuery}
-      onSelectProject={(proj) => setActiveProject(proj)}
+      onSelectProject={handleSelectProject}
       onOpenClaim={handleOpenClaim}
       onSelectBuilder={handleSelectBuilder}
       activeProject={activeProject}
@@ -203,7 +209,7 @@ function AppLayout() {
                 <div className="w-full pt-4">
                   <ProjectMasonry
                     projects={filteredProjects}
-                    onSelectProject={(proj) => setActiveProject(proj)}
+                    onSelectProject={handleSelectProject}
                     onOpenClaim={handleOpenClaim}
                     onSelectBuilder={handleSelectBuilder}
                   />
@@ -239,10 +245,7 @@ function AppLayout() {
         isOpen={isFavoritesOpen}
         onClose={() => setIsFavoritesOpen(false)}
         allProjects={projects}
-        onSelectProject={(proj) => {
-          setIsFavoritesOpen(false);
-          setActiveProject(proj);
-        }}
+        onSelectProject={handleSelectProject}
       />
 
       {/* SUBMIT / CLAIM MODAL */}

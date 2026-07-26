@@ -161,7 +161,41 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
     filters.categories.length +
     filters.aiModels.length;
 
-  const profilePushX = activeProject ? -540 : (isFilterDrawerOpen ? -370 : 0);
+  // Track window width for pixel-exact mobile & desktop push content calculations
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close filter drawer if project drawer is opened to prevent double-drawer overlap
+  useEffect(() => {
+    if (activeProject) {
+      setIsFilterDrawerOpen(false);
+    }
+  }, [activeProject]);
+
+  const profilePushX = useMemo(() => {
+    if (activeProject) {
+      // Since App.tsx's wrapper is already shifting by pushX when activeProject is open,
+      // the BuilderProfilePage content does NOT need to shift relative to its parent.
+      return 0;
+    }
+
+    const isMobile = windowWidth < 640;
+    const mobileOffset = -(windowWidth - 64);
+
+    if (isFilterDrawerOpen) {
+      return isMobile ? mobileOffset : -370;
+    }
+    return 0;
+  }, [activeProject, isFilterDrawerOpen, windowWidth]);
 
   return (
     <div className="w-full relative">
@@ -171,7 +205,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
         animate={{
           x: profilePushX,
         }}
-        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
         className="w-full flex flex-col space-y-6"
       >
         

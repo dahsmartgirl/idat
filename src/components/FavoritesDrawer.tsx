@@ -43,9 +43,9 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
             transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={{ left: 0, right: 0.5 }}
+            dragElastic={{ left: 0, right: 0.7 }}
             onDragEnd={(_, info) => {
-              if (info.offset.x > 80 || info.velocity.x > 300) {
+              if (info.offset.x > 80 || info.velocity.x > 400) {
                 onClose();
               }
             }}
