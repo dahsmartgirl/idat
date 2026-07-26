@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { Header } from './components/Header';
@@ -15,6 +15,8 @@ import type { Project, FilterState } from './types';
 
 function AppLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -32,6 +34,14 @@ function AppLayout() {
   const [claimingProject, setClaimingProject] = useState<Project | null>(null);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+
+  // Clean up drawer states and scroll to top whenever the URL route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    setActiveProject(null);
+    setIsFilterDrawerOpen(false);
+    setIsFavoritesOpen(false);
+  }, [location.pathname]);
 
   // Filter calculation logic for Home Grid
   const filteredProjects = useMemo(() => {
@@ -87,6 +97,9 @@ function AppLayout() {
 
   const handleSelectBuilder = (builderHandle: string) => {
     const cleanHandle = builderHandle.replace('@', '');
+    setActiveProject(null);
+    setIsFilterDrawerOpen(false);
+    setIsFavoritesOpen(false);
     navigate(`/${cleanHandle}`);
   };
 
@@ -179,6 +192,9 @@ function AppLayout() {
             <Route path="/b/:username" element={renderProfilePage()} />
             <Route path="/builder/:username" element={renderProfilePage()} />
             <Route path="/:username" element={renderProfilePage()} />
+            
+            {/* Fallback route to prevent any 404s */}
+            <Route path="*" element={renderProfilePage()} />
           </Routes>
         </main>
       </motion.div>
