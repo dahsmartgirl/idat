@@ -192,35 +192,40 @@ function AppLayout() {
           onOpenProfile={() => handleSelectBuilder('ileri')}
         />
 
-        {/* ROUTED CONTENT */}
-        <Routes>
-          {/* HOME PAGE ROUTE */}
-          <Route
-            path="/"
-            element={
-              <main className="flex-1 flex flex-col w-full pb-16 sm:pb-24">
-                {/* TOOL FILTER CHIPS BAR WITH INTEGRATED COUNTERS & EXPANDABLE DRAWER TRIGGER */}
-                <ToolFilterBar
-                  onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
-                  activeFilterCount={activeFilterCount}
-                />
+        {/* Dynamic Main Body Content via Router */}
+        <main className="flex-1 w-full py-2">
+          <Routes>
+            {/* HOME PAGE ROUTE */}
+            <Route
+              path="/"
+              element={
+                <>
+                  {/* TOOL FILTER CHIPS BAR WITH INTEGRATED COUNTERS & EXPANDABLE DRAWER TRIGGER */}
+                  <ToolFilterBar
+                    onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
+                    activeFilterCount={activeFilterCount}
+                  />
 
-                {/* MASONRY PROJECT GRID */}
-                <div className="w-full pt-4">
+                  {/* MASONRY PROJECT GRID */}
                   <ProjectMasonry
                     projects={filteredProjects}
                     onSelectProject={handleSelectProject}
                     onOpenClaim={handleOpenClaim}
                     onSelectBuilder={handleSelectBuilder}
                   />
-                </div>
-              </main>
-            }
-          />
+                </>
+              }
+            />
 
-          {/* BUILDER PROFILE DIRECT ROUTE */}
-          <Route path="/:builderHandle" element={renderProfilePage()} />
-        </Routes>
+            {/* Profile Route variations: /b/:username, /builder/:username, /:username */}
+            <Route path="/b/:username" element={renderProfilePage()} />
+            <Route path="/builder/:username" element={renderProfilePage()} />
+            <Route path="/:username" element={renderProfilePage()} />
+            
+            {/* Fallback route to prevent any 404s */}
+            <Route path="*" element={renderProfilePage()} />
+          </Routes>
+        </main>
       </motion.div>
 
       {/* PROJECT DETAILS SIDE DRAWER */}

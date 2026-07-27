@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Project, FilterState } from '../types';
+import { getBuilderGradient } from '../types';
 import { MOCK_BUILDERS, MOCK_PROJECTS } from '../data/mockData';
 import { SlidersHorizontal } from 'lucide-react';
 import { ProjectMasonry } from './ProjectMasonry';
@@ -216,7 +217,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
           <div className="flex items-center gap-4 sm:gap-8 min-w-0">
             
             {/* Pure Gradient Avatar Circle */}
-            <div className="w-20 h-20 xs:w-28 xs:h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br from-[#101010] via-[#2A2A2A] to-[#545454] shrink-0 shadow-sm border border-[#E0E0E0]/50" />
+            <div className={`w-20 h-20 xs:w-28 xs:h-28 sm:w-36 sm:h-36 rounded-full ${getBuilderGradient(builder.username)} shrink-0 shadow-sm border border-[#E0E0E0]/50`} />
 
             {/* User Info Column */}
             <div className="space-y-1 sm:space-y-1.5 min-w-0 flex-1">

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Project } from '../types';
+import { getBuilderGradient } from '../types';
 import { Bookmark, ArrowUpRight } from 'lucide-react';
 import { useFavorites } from '../context/FavoritesContext';
 import { ToolLogo } from './ToolLogos';
@@ -12,16 +13,6 @@ interface ProjectCardProps {
   onSelectBuilder?: (handle: string) => void;
 }
 
-// Curated vibrant gradients for claimed builder avatars
-const AVATAR_GRADIENTS = [
-  'bg-gradient-to-br from-[#101010] to-[#434343]',
-  'bg-gradient-to-br from-[#D97757] to-[#F8A170]',
-  'bg-gradient-to-br from-[#2563EB] to-[#60A5FA]',
-  'bg-gradient-to-br from-[#059669] to-[#34D399]',
-  'bg-gradient-to-br from-[#7C3AED] to-[#C084FC]',
-  'bg-gradient-to-br from-[#E11D48] to-[#FB7185]',
-];
-
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
   heightClass = 'h-[304px]',
@@ -31,10 +22,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorited = isFavorite(project.id);
-
-  // Hash project id to pick gradient for claimed avatar
-  const charSum = project.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const claimedAvatarGrad = AVATAR_GRADIENTS[charSum % AVATAR_GRADIENTS.length];
 
   return (
     <div 
@@ -81,7 +68,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                     onSelectBuilder(project.claimedBy[0] || 'ileri');
                   }
                 }}
-                className={`w-[16px] h-[16px] rounded-full outline-[1.2px] outline-[#F2F1F3] shrink-0 hover:scale-110 transition-transform cursor-pointer ${claimedAvatarGrad}`} 
+                className={`w-[16px] h-[16px] rounded-full outline-[1.2px] outline-[#F2F1F3] shrink-0 hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(project.claimedBy[0])}`} 
                 title={`Claimed by @${project.claimedBy[0] || 'ileri'} (Click to view profile)`}
               />
             ) : (

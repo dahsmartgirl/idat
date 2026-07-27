@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '../types';
+import { getBuilderGradient } from '../types';
 import { ToolLogo } from './ToolLogos';
 import { 
   X, 
@@ -241,7 +242,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       title={`View @${builderHandle} profile`}
                     >
                       {/* Gradient Avatar Circle */}
-                      <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-[#101010] via-[#2A2A2A] to-[#545454] shrink-0" />
+                      <div className={`w-3.5 h-3.5 rounded-full ${getBuilderGradient(builderHandle)} shrink-0`} />
                       <span className="text-mono-10 !text-[#0011FF] font-medium">@{builderHandle}</span>
                     </button>
                   ) : (

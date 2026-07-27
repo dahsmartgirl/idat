@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Bookmark, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
+import { getBuilderGradient } from '../types';
 
 interface HeaderProps {
   searchQuery: string;
@@ -237,7 +238,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Pure Gradient Avatar Circle (27px, No Initials) */}
         <button
           onClick={onOpenProfile}
-          className="w-[27px] h-[27px] rounded-full bg-gradient-to-br from-[#101010] via-[#2A2A2A] to-[#545454] shrink-0 hover:scale-105 transition-transform cursor-pointer shadow-xs border border-white/10"
+          className={`w-[27px] h-[27px] rounded-full ${getBuilderGradient('ileri')} shrink-0 hover:scale-105 transition-transform cursor-pointer shadow-xs border border-white/10`}
           title="View @ileri profile"
         />
       </motion.div>

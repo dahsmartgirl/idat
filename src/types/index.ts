@@ -84,3 +84,16 @@ export interface FilterState {
   aiModels: string[];
   status: 'all' | 'claimed' | 'unclaimed';
 }
+
+export const BUILDER_GRADIENTS: Record<string, string> = {
+  'ileri': 'bg-gradient-to-br from-[#101010] via-[#2A2A2A] to-[#545454]', // black/grey
+  'maya': 'bg-gradient-to-br from-[#E11D48] via-[#F43F5E] to-[#FB7185]',  // pink
+  'josh': 'bg-gradient-to-br from-[#2563EB] via-[#3B82F6] to-[#60A5FA]',  // blue
+};
+
+export const getBuilderGradient = (username?: string) => {
+  if (!username) return BUILDER_GRADIENTS['ileri'];
+  const clean = username.replace('@', '').toLowerCase();
+  return BUILDER_GRADIENTS[clean] || BUILDER_GRADIENTS['ileri'];
+};
+
