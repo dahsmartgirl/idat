@@ -10,6 +10,7 @@
   letter-spacing: 0 !important;
   scrollbar-width: thin;
   scrollbar-color: #C2C2C2 #F2F1F3;
+  font-weight: 400 !important;
 }
 
 html, body {

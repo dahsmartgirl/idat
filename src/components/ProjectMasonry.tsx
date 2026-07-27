@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { Project } from '../types';
 import { ProjectCard } from './ProjectCard';
 import { SearchX, RotateCcw } from 'lucide-react';
@@ -21,6 +22,25 @@ const SCALED_HEIGHTS = [
   'h-[360px]',
   'h-[304px]',
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.35, ease: [0.25, 1, 0.5, 1] } 
+  }
+};
 
 export const ProjectMasonry: React.FC<ProjectMasonryProps> = ({
   projects,
@@ -66,25 +86,93 @@ export const ProjectMasonry: React.FC<ProjectMasonryProps> = ({
     );
   }
 
+  // Distribute projects into columns programmatically to preserve left-to-right chronological ordering
+  const getColumns = (numCols: number) => {
+    const cols: Project[][] = Array.from({ length: numCols }, () => []);
+    projects.forEach((project, idx) => {
+      cols[idx % numCols].push(project);
+    });
+    return cols;
+  };
+
+  const cols2 = getColumns(2);
+  const cols3 = getColumns(3);
+
   return (
     <div className="w-full px-4 sm:px-8 py-2">
-      {/* Reduced column gaps (gap-3.5) and tighter row spacing (space-y-5) */}
-      <div className="columns-1 md:columns-2 lg:columns-3 gap-3.5 space-y-5">
-        {projects.map((project, index) => {
-          const heightClass = SCALED_HEIGHTS[index % SCALED_HEIGHTS.length];
-          return (
-            <div key={project.id} className="break-inside-avoid">
-              <ProjectCard
-                project={project}
-                heightClass={heightClass}
-                onSelectProject={onSelectProject}
-                onOpenClaim={onOpenClaim}
-                onSelectBuilder={onSelectBuilder}
-              />
-            </div>
-          );
-        })}
-      </div>
+      {/* Mobile Layout: 1 Column (Sequential chronological order) */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="flex flex-col space-y-5 md:hidden"
+      >
+        {projects.map((project, index) => (
+          <motion.div key={project.id} variants={cardVariants}>
+            <ProjectCard
+              project={project}
+              heightClass={SCALED_HEIGHTS[index % SCALED_HEIGHTS.length]}
+              onSelectProject={onSelectProject}
+              onOpenClaim={onOpenClaim}
+              onSelectBuilder={onSelectBuilder}
+            />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Tablet Layout: 2 Columns */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="hidden md:flex lg:hidden gap-3.5"
+      >
+        {cols2.map((col, colIdx) => (
+          <div key={colIdx} className="flex-1 flex flex-col space-y-5">
+            {col.map((project) => {
+              const originalIndex = projects.findIndex(p => p.id === project.id);
+              return (
+                <motion.div key={project.id} variants={cardVariants}>
+                  <ProjectCard
+                    project={project}
+                    heightClass={SCALED_HEIGHTS[originalIndex % SCALED_HEIGHTS.length]}
+                    onSelectProject={onSelectProject}
+                    onOpenClaim={onOpenClaim}
+                    onSelectBuilder={onSelectBuilder}
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Desktop Layout: 3 Columns */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="hidden lg:flex gap-3.5"
+      >
+        {cols3.map((col, colIdx) => (
+          <div key={colIdx} className="flex-1 flex flex-col space-y-5">
+            {col.map((project) => {
+              const originalIndex = projects.findIndex(p => p.id === project.id);
+              return (
+                <motion.div key={project.id} variants={cardVariants}>
+                  <ProjectCard
+                    project={project}
+                    heightClass={SCALED_HEIGHTS[originalIndex % SCALED_HEIGHTS.length]}
+                    onSelectProject={onSelectProject}
+                    onOpenClaim={onOpenClaim}
+                    onSelectBuilder={onSelectBuilder}
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
+        ))}
+      </motion.div>
     </div>
   );
 };

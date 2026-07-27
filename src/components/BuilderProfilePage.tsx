@@ -201,12 +201,18 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
   return (
     <div className="w-full relative">
       
-      {/* Sliding Content Container (Pushed out to the left when Filter Side Drawer or Project Drawer is Open) */}
       <motion.div
+        initial={{ opacity: 0, y: 15 }}
         animate={{
           x: profilePushX,
+          opacity: 1,
+          y: 0,
         }}
-        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+        transition={{
+          x: { duration: 0.3, ease: [0.25, 1, 0.5, 1] },
+          opacity: { duration: 0.45, ease: [0.25, 1, 0.5, 1] },
+          y: { duration: 0.45, ease: [0.25, 1, 0.5, 1] },
+        }}
         className="w-full flex flex-col space-y-6"
       >
         

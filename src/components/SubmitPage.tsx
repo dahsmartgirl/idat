@@ -532,7 +532,12 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
           <p className="text-mono-10">submitting assets to the idat registry</p>
         </div>
       ) : (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className="max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full"
+        >
           
           {/* Bare Back Button above the title (no background) */}
           <div className="mb-2.5">
@@ -570,7 +575,13 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                   
                   {/* -------------------- STEP 1: LINKS, DETAILS, & NOTES -------------------- */}
                   {step === 1 && (
-                    <div className="space-y-4">
+                    <motion.div 
+                      key="step-1"
+                      initial={{ opacity: 0, x: 8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+                      className="space-y-4"
+                    >
                       
                       {/* Row 1: Name and Category dropdown inline */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -1012,12 +1023,18 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                          )}
                       </div>
 
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* -------------------- STEP 2: MEDIA UPLOADS -------------------- */}
                   {step === 2 && (
-                    <div className="space-y-4.5">
+                    <motion.div 
+                      key="step-2"
+                      initial={{ opacity: 0, x: 8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+                      className="space-y-4.5"
+                    >
                       
                       {/* Cover image upload */}
                       <div>
@@ -1141,7 +1158,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                         )}
                       </div>
 
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Mobile Preview under Step 2 */}
@@ -1232,7 +1249,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
 
           </div>
 
-        </div>
+        </motion.div>
       )}
     </div>
   );
