@@ -11,6 +11,8 @@
   scrollbar-width: thin;
   scrollbar-color: #C2C2C2 #F2F1F3;
   font-weight: 400 !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html, body {
@@ -18,6 +20,8 @@ html, body {
   color: #545454 !important;
   font-family: 'Inter', sans-serif !important;
   letter-spacing: 0 !important;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   margin: 0;
   padding: 0;
   width: 100%;
