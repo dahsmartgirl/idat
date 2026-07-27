@@ -8,6 +8,7 @@ import { ProjectMasonry } from './components/ProjectMasonry';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { BuilderProfilePage } from './components/BuilderProfilePage';
 import { SubmitModal } from './components/SubmitModal';
+import { SubmitPage } from './components/SubmitPage';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { FilterDrawer } from './components/FilterDrawer';
 import { MOCK_PROJECTS } from './data/mockData';
@@ -45,6 +46,7 @@ function AppLayout() {
   // Modals & Drawers state
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [claimingProject, setClaimingProject] = useState<Project | null>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
@@ -132,11 +134,36 @@ function AppLayout() {
       setProjects((prev) =>
         prev.map((p) =>
           p.id === claimingProject.id
-            ? { ...p, isClaimed: true, claimedBy: newProjectData.claimedBy || ['ileri'] }
+            ? { 
+                ...p, 
+                isClaimed: true, 
+                claimedBy: newProjectData.claimedBy || ['ileri'],
+                demoUrl: newProjectData.demoUrl || p.demoUrl,
+                githubUrl: newProjectData.githubUrl || p.githubUrl,
+                youtubeUrl: newProjectData.youtubeUrl || p.youtubeUrl,
+              }
             : p
         )
       );
+      if (activeProject && activeProject.id === claimingProject.id) {
+        setActiveProject((prev) => prev ? {
+          ...prev,
+          isClaimed: true,
+          claimedBy: newProjectData.claimedBy || ['ileri'],
+          demoUrl: newProjectData.demoUrl || prev.demoUrl,
+          githubUrl: newProjectData.githubUrl || prev.githubUrl,
+          youtubeUrl: newProjectData.youtubeUrl || prev.youtubeUrl,
+        } : null);
+      }
       setClaimingProject(null);
+    } else if (editingProject) {
+      setProjects((prev) =>
+        prev.map((p) => (p.id === editingProject.id ? { ...p, ...newProjectData } as Project : p))
+      );
+      if (activeProject && activeProject.id === editingProject.id) {
+        setActiveProject((prev) => prev ? { ...prev, ...newProjectData } as Project : null);
+      }
+      setEditingProject(null);
     } else {
       setProjects((prev) => [newProjectData as Project, ...prev]);
     }
@@ -185,8 +212,7 @@ function AppLayout() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onOpenSubmit={() => {
-            setClaimingProject(null);
-            setIsSubmitOpen(true);
+            navigate('/new');
           }}
           onOpenFavorites={() => setIsFavoritesOpen(true)}
           onOpenProfile={() => handleSelectBuilder('ileri')}
@@ -217,6 +243,12 @@ function AppLayout() {
               }
             />
 
+            {/* New Project Page */}
+            <Route path="/new" element={<SubmitPage onSubmitSuccess={handleAddProject} projects={projects} />} />
+
+            {/* Edit Project Page */}
+            <Route path="/edit/:slug" element={<SubmitPage onSubmitSuccess={handleAddProject} projects={projects} />} />
+
             {/* Profile Route variations: /b/:username, /builder/:username, /:username */}
             <Route path="/b/:username" element={renderProfilePage()} />
             <Route path="/builder/:username" element={renderProfilePage()} />
@@ -234,6 +266,10 @@ function AppLayout() {
         onClose={() => setActiveProject(null)}
         onSelectBuilder={handleSelectBuilder}
         onOpenClaim={handleOpenClaim}
+        onEditProject={(project) => {
+          setActiveProject(null);
+          navigate(`/edit/${project.slug}`);
+        }}
       />
 
       {/* FILTER EXPANDABLE SIDE DRAWER */}
@@ -253,15 +289,17 @@ function AppLayout() {
         onSelectProject={handleSelectProject}
       />
 
-      {/* SUBMIT / CLAIM MODAL */}
+      {/* SUBMIT / CLAIM / EDIT MODAL */}
       <SubmitModal
         isOpen={isSubmitOpen}
         onClose={() => {
           setIsSubmitOpen(false);
           setClaimingProject(null);
+          setEditingProject(null);
         }}
         onSubmitSuccess={handleAddProject}
         claimingProject={claimingProject}
+        editingProject={editingProject}
       />
 
     </div>

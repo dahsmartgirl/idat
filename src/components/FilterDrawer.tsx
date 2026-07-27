@@ -263,7 +263,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                 <div>
                   <div className="mb-1.5">
                     <span className="text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal">
-                      ai tools
+                      built with
                     </span>
                   </div>
 

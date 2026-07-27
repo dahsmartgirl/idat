@@ -4,6 +4,18 @@ import { getBuilderGradient } from '../types';
 import { Bookmark, ArrowUpRight } from 'lucide-react';
 import { useFavorites } from '../context/FavoritesContext';
 import { ToolLogo } from './ToolLogos';
+import { motion } from 'framer-motion';
+
+const getModelColor = (modelName: string) => {
+  const lowercaseName = modelName.toLowerCase();
+  if (lowercaseName.includes('claude 3.7')) return '#D97757';
+  if (lowercaseName.includes('claude 3.5')) return '#D97757';
+  if (lowercaseName.includes('gpt-4o')) return '#10B981';
+  if (lowercaseName.includes('gemini 2.0')) return '#0284C7';
+  if (lowercaseName.includes('deepseek')) return '#3B82F6';
+  if (lowercaseName.includes('o3-mini')) return '#10B981';
+  return '#999999';
+};
 
 interface ProjectCardProps {
   project: Project;
@@ -21,7 +33,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onSelectBuilder,
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
-  const favorited = isFavorite(project.id);
+  const [localFavorite, setLocalFavorite] = React.useState(false);
+  const favorited = project.id === 'temp-preview-id' ? localFavorite : isFavorite(project.id);
+
+  const firstTool = project.aiTools && project.aiTools.length > 0 ? project.aiTools[0] : null;
+  const modelsArray = project.aiModel ? project.aiModel.split(',').map(m => m.trim()).filter(Boolean) : [];
+  const firstModel = modelsArray.length > 0 ? modelsArray[0] : null;
+  const remainingCount = Math.max(0, (project.aiTools ? project.aiTools.length : 0) - 1) + Math.max(0, modelsArray.length - 1);
 
   return (
     <div 
@@ -35,7 +53,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            toggleFavorite(project.id);
+            if (project.id === 'temp-preview-id') {
+              setLocalFavorite(!localFavorite);
+            } else {
+              toggleFavorite(project.id);
+            }
           }}
           className="absolute top-2.5 right-2.5 p-1 text-[#545454] hover:opacity-80 transition-transform active:scale-90"
           title={favorited ? 'Remove Bookmark' : 'Bookmark Thing'}
@@ -54,23 +76,77 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         {/* Title Row: Title + (Claimed Avatar OR Unclaimed Badge) + ArrowUpRight Link on Right */}
         <div className="flex items-center justify-between gap-2">
           
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-inter-16 truncate">
-              {project.name}
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <span className="text-inter-16 truncate max-w-full">
+              {project.name ? (
+                project.name
+              ) : (
+                <span className="inline-block relative overflow-hidden bg-[#E9E9E9] h-4 w-32 rounded-none align-middle">
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                    initial={{ x: '-100%' }}
+                    animate={{ x: '100%' }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                  />
+                </span>
+              )}
             </span>
 
-            {/* If claimed: Avatar near title opens Builder Profile Page */}
+            {/* If claimed: Avatars stack near title */}
             {project.isClaimed ? (
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onSelectBuilder) {
-                    onSelectBuilder(project.claimedBy[0] || 'ileri');
-                  }
-                }}
-                className={`w-[16px] h-[16px] rounded-full outline-[1.2px] outline-[#F2F1F3] shrink-0 hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(project.claimedBy[0])}`} 
-                title={`Claimed by @${project.claimedBy[0] || 'ileri'} (Click to view profile)`}
-              />
+              project.claimedBy && project.claimedBy.length > 0 ? (
+                <div className="flex -space-x-1 items-center shrink-0">
+                  {project.claimedBy.length <= 3 ? (
+                    project.claimedBy.map((builder, idx) => (
+                      <button 
+                        key={builder}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onSelectBuilder) {
+                            onSelectBuilder(builder);
+                          }
+                        }}
+                        style={{ zIndex: idx + 1 }}
+                        className={`w-[16px] h-[16px] rounded-full outline-2 outline-[#F2F1F3] hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(builder)}`} 
+                        title={`Claimed by @${builder} (Click to view profile)`}
+                      />
+                    ))
+                  ) : (
+                    <>
+                      {project.claimedBy.slice(0, 2).map((builder, idx) => (
+                        <button 
+                          key={builder}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onSelectBuilder) {
+                              onSelectBuilder(builder);
+                            }
+                          }}
+                          style={{ zIndex: idx + 1 }}
+                          className={`w-[16px] h-[16px] rounded-full outline-2 outline-[#F2F1F3] hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(builder)}`} 
+                          title={`Claimed by @${builder} (Click to view profile)`}
+                        />
+                      ))}
+                      <div
+                        style={{ zIndex: 3 }}
+                        className="w-[16px] h-[16px] rounded-full outline-2 outline-[#F2F1F3] bg-[#D9D9D9] flex items-center justify-center text-[7.5px] font-sans font-bold text-[#545454] select-none shrink-0"
+                        title={`${project.claimedBy.length - 2} more builders`}
+                      >
+                        +{project.claimedBy.length - 2}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="relative overflow-hidden w-[16px] h-[16px] rounded-full bg-[#C2C2C2] shrink-0">
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                    initial={{ x: '-100%' }}
+                    animate={{ x: '100%' }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                  />
+                </div>
+              )
             ) : (
               <button
                 onClick={(e) => {
@@ -101,29 +177,65 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         </div>
 
         {/* Description / One-liner */}
-        <p className="text-inter-14 line-clamp-2 leading-tight">
-          {project.tagline}
+        <p className="text-inter-14 line-clamp-2 leading-tight min-h-[14px]">
+          {project.tagline ? (
+            project.tagline
+          ) : (
+            <span className="block relative overflow-hidden bg-[#E9E9E9] h-3.5 w-48 rounded-none">
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+              />
+            </span>
+          )}
         </p>
 
-        {/* Bottom Row: AI Tool Pills with Official Vector Logos */}
+        {/* Bottom Row: AI Tool & Model Pills */}
         <div className="flex items-center gap-1.5 flex-wrap mt-1">
-          {project.aiTools && project.aiTools.length > 0 ? (
-            project.aiTools.slice(0, 3).map((tool) => (
-              <div key={tool} className="tool-pill">
-                <ToolLogo toolId={tool} size={11} />
-                <span className="text-mono-10">{tool}</span>
+          {project.id === 'temp-preview-id' && !firstTool && !firstModel ? (
+            /* Blank preview card skeleton placeholder with sweep effect */
+            <>
+              <div className="relative overflow-hidden bg-[#E9E9E9] h-[18px] w-12 rounded-none">
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '100%' }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                />
               </div>
-            ))
+              <div className="relative overflow-hidden bg-[#E9E9E9] h-[18px] w-14 rounded-none">
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '100%' }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                />
+              </div>
+            </>
           ) : (
             <>
-              <div className="tool-pill">
-                <ToolLogo toolId="claude-code" size={11} />
-                <span className="text-mono-10">Claude code</span>
-              </div>
-              <div className="tool-pill">
-                <ToolLogo toolId="cursor" size={11} />
-                <span className="text-mono-10">Cursor</span>
-              </div>
+              {firstTool && (
+                <div className="tool-pill">
+                  <ToolLogo toolId={firstTool} size={11} />
+                  <span className="text-mono-10">{firstTool}</span>
+                </div>
+              )}
+              {firstModel && (
+                <div className="tool-pill">
+                  <div
+                    className="w-1.5 h-1.5 shrink-0"
+                    style={{ backgroundColor: getModelColor(firstModel) }}
+                  />
+                  <span className="text-mono-10">{firstModel}</span>
+                </div>
+              )}
+              {remainingCount > 0 && (
+                <div className="tool-pill">
+                  <span className="text-mono-10 font-bold">+{remainingCount}</span>
+                </div>
+              )}
             </>
           )}
         </div>

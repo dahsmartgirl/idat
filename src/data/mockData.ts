@@ -40,6 +40,28 @@ export const MOCK_BUILDERS: Record<string, Builder> = {
     foundingNumber: 88,
     joinedDate: 'July 2026',
     topTools: ['gemini-cli', 'claude-code']
+  },
+  'sarah': {
+    id: 'b-sarah',
+    username: 'sarah',
+    displayName: 'Sarah Chen',
+    role: 'Frontend Architect',
+    bio: 'Exploring declarative UI design and design systems with v0, Windsurf and Claude.',
+    isFoundingBuilder: true,
+    foundingNumber: 104,
+    joinedDate: 'July 2026',
+    topTools: ['v0', 'windsurf']
+  },
+  'alex': {
+    id: 'b-alex',
+    username: 'alex',
+    displayName: 'Alex Rivers',
+    role: 'Independent Developer',
+    bio: 'Solopreneur building AI agents and CLI tools using Cursor & Gemini.',
+    isFoundingBuilder: true,
+    foundingNumber: 211,
+    joinedDate: 'July 2026',
+    topTools: ['cursor', 'gemini-cli']
   }
 };
 
@@ -58,11 +80,8 @@ export const MOCK_PROJECTS: Project[] = [
     category: 'MCP Servers',
     tags: ['MCP Protocol', 'Electron', 'Developer Tools', 'Open Source'],
     techStack: ['TypeScript', 'React', 'Electron', 'TailwindCSS'],
-    coverImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-    screenshots: [
-      'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80'
-    ],
+    coverImage: '',
+    screenshots: [],
     demoUrl: 'https://mcp-inspector.dev',
     githubUrl: 'https://github.com/ilerioluwa/mcp-fs-inspector',
     createdAt: '2026-07-22',
@@ -93,10 +112,8 @@ export const MOCK_PROJECTS: Project[] = [
     category: 'SaaS',
     tags: ['Marketing', 'Web App', 'Glassmorphism', 'Design System'],
     techStack: ['React', 'Vite', 'TailwindCSS', 'Framer Motion'],
-    coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80',
-    screenshots: [
-      'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80'
-    ],
+    coverImage: '',
+    screenshots: [],
     demoUrl: 'https://instantlanding.ai',
     githubUrl: 'https://github.com/joshm/instant-landing',
     createdAt: '2026-07-18',
@@ -126,10 +143,8 @@ export const MOCK_PROJECTS: Project[] = [
     category: 'CLI Tools',
     tags: ['Multimodal', 'Video Processing', 'QA Tools', 'Developer Productivity'],
     techStack: ['Node.js', 'Google GenAI SDK', 'FFmpeg', 'Commander.js'],
-    coverImage: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=1200&q=80',
-    screenshots: [
-      'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=1200&q=80'
-    ],
+    coverImage: '',
+    screenshots: [],
     githubUrl: 'https://github.com/mayalin/gemini-video-cli',
     createdAt: '2026-07-21',
     updatedAt: '2026-07-24',
@@ -158,10 +173,8 @@ export const MOCK_PROJECTS: Project[] = [
     category: 'Chrome Extensions',
     tags: ['Browser Extension', 'Productivity', 'Tab Management', 'Local AI'],
     techStack: ['JavaScript', 'Chrome Extension Manifest V3', 'TailwindCSS'],
-    coverImage: 'https://images.unsplash.com/photo-1542744094-3a3172720449?auto=format&fit=crop&w=1200&q=80',
-    screenshots: [
-      'https://images.unsplash.com/photo-1542744094-3a3172720449?auto=format&fit=crop&w=1200&q=80'
-    ],
+    coverImage: '',
+    screenshots: [],
     githubUrl: 'https://github.com/unclaimed/semantic-tab-cluster',
     createdAt: '2026-07-15',
     updatedAt: '2026-07-15',
@@ -189,10 +202,8 @@ export const MOCK_PROJECTS: Project[] = [
     category: 'Games',
     tags: ['WebGPU', 'Three.js', 'Shader', 'Browser Game', '3D Graphics'],
     techStack: ['Three.js', 'TypeScript', 'WebGPU', 'Web Audio API'],
-    coverImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80',
-    screenshots: [
-      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80'
-    ],
+    coverImage: '',
+    screenshots: [],
     demoUrl: 'https://synthwave-runner.game',
     createdAt: '2026-07-19',
     updatedAt: '2026-07-19',
@@ -208,7 +219,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 'proj-6',
-    slug: 'voice-code-assistant',
+    slug: 'synthwave-retro-runner-2',
     name: 'Whisper Code Assistant',
     tagline: 'Voice-to-code VS Code extension for hands-free refactoring.',
     description: 'Speak your refactoring instructions aloud and watch your editor execute precise multi-file diffs using localized Whisper model transcription.',
@@ -220,10 +231,8 @@ export const MOCK_PROJECTS: Project[] = [
     category: 'VS Code Extensions',
     tags: ['Voice UI', 'VS Code', 'Refactoring', 'Accessibility'],
     techStack: ['TypeScript', 'VS Code API', 'Whisper.cpp', 'WebAssembly'],
-    coverImage: 'https://images.unsplash.com/photo-1589254065878-42c9da997008?auto=format&fit=crop&w=1200&q=80',
-    screenshots: [
-      'https://images.unsplash.com/photo-1589254065878-42c9da997008?auto=format&fit=crop&w=1200&q=80'
-    ],
+    coverImage: '',
+    screenshots: [],
     githubUrl: 'https://github.com/ilerioluwa/voice-code-assistant',
     createdAt: '2026-07-10',
     updatedAt: '2026-07-20',
@@ -237,5 +246,77 @@ export const MOCK_PROJECTS: Project[] = [
       { date: 'July 10, 2026', title: 'Project Initiated', type: 'started' },
       { date: 'July 20, 2026', title: 'VS Code Marketplace Beta', type: 'launch' }
     ]
+  },
+  {
+    id: 'proj-7',
+    slug: 'schema-weaver-ai',
+    name: 'SchemaWeaver AI',
+    tagline: 'Generate semantic database schemas and migrations from chat prompts.',
+    description: 'Generate semantic database schemas and migrations from chat prompts.',
+    isClaimed: true,
+    claimedBy: ['sarah'],
+    primaryTool: 'v0',
+    aiTools: ['v0', 'windsurf'],
+    aiModel: 'Claude 3.5 Sonnet',
+    category: 'APIs',
+    tags: ['Database', 'Developer Tool', 'API'],
+    techStack: ['React', 'PostgreSQL', 'Prisma'],
+    coverImage: '',
+    screenshots: [],
+    buildNotes: {
+      whyBuilt: 'Relational databases are tedious to design by hand. I wanted an AI that visually generates schema code alongside interactive charts.',
+      aiRoleAndPrompts: 'v0 built the interactive canvas and Prisma code block UI.',
+      challengesAndFailures: 'Recursive relationship loops crashed the initial parser; resolved by introducing cycle detection routines.',
+      lessonsLearned: 'Visual builders require custom AST parsers rather than general string regexes.'
+    },
+    timeline: []
+  },
+  {
+    id: 'proj-8',
+    slug: 'git-scribe-agent',
+    name: 'GitScribe Agent',
+    tagline: 'Terminal agent that auto-documents visual pull requests from diff files.',
+    description: 'Terminal agent that auto-documents visual pull requests from diff files.',
+    isClaimed: true,
+    claimedBy: ['alex'],
+    primaryTool: 'gemini-cli',
+    aiTools: ['gemini-cli', 'cursor'],
+    aiModel: 'Gemini 2.0 Flash',
+    category: 'CLI Tools',
+    tags: ['Git', 'Automation', 'CLI'],
+    techStack: ['Node.js', 'Google GenAI SDK'],
+    coverImage: '',
+    screenshots: [],
+    buildNotes: {
+      whyBuilt: 'I was spending too much time explaining UI shifts in my PRs. GitScribe captures terminal diffs and analyzes screenshot assets.',
+      aiRoleAndPrompts: 'Cursor Composer generated the shell hook scripts.',
+      challengesAndFailures: 'Large binary diffs hit LLM token limits; resolved by chunking code changes.',
+      lessonsLearned: 'Focusing context only on modified AST functions saves tokens and yields better summary files.'
+    },
+    timeline: []
+  },
+  {
+    id: 'proj-9',
+    slug: 'terminal-rhythm-racer',
+    name: 'Terminal Rhythm Racer',
+    tagline: 'Console arcade rhythm game based on keyboard typing speed.',
+    description: 'Console arcade rhythm game based on keyboard typing speed.',
+    isClaimed: false,
+    claimedBy: [],
+    primaryTool: 'cursor',
+    aiTools: ['cursor'],
+    aiModel: 'GPT-4o',
+    category: 'Games',
+    tags: ['Terminal', 'Keyboard', 'Game'],
+    techStack: ['Node.js', 'Inquirer'],
+    coverImage: '',
+    screenshots: [],
+    buildNotes: {
+      whyBuilt: 'Wanted to check if complex timing games are playable inside basic ANSI terminal buffers.',
+      aiRoleAndPrompts: 'Built inside Cursor with minimal prompt tweaks.',
+      challengesAndFailures: 'Terminal render stutter on keypresses required disabling prompt buffering.',
+      lessonsLearned: 'Terminals are surprisingly fast when using direct stdout write statements.'
+    },
+    timeline: []
   }
 ];

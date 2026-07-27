@@ -89,6 +89,8 @@ export const BUILDER_GRADIENTS: Record<string, string> = {
   'ileri': 'bg-gradient-to-br from-[#101010] via-[#2A2A2A] to-[#545454]', // black/grey
   'maya': 'bg-gradient-to-br from-[#E11D48] via-[#F43F5E] to-[#FB7185]',  // pink
   'josh': 'bg-gradient-to-br from-[#2563EB] via-[#3B82F6] to-[#60A5FA]',  // blue
+  'sarah': 'bg-gradient-to-br from-[#7C3AED] via-[#8B5CF6] to-[#A78BFA]', // violet
+  'alex': 'bg-gradient-to-br from-[#059669] via-[#10B981] to-[#34D399]',  // emerald
 };
 
 export const getBuilderGradient = (username?: string) => {

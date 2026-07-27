@@ -18,12 +18,41 @@ import {
 } from 'lucide-react';
 import { useFavorites } from '../context/FavoritesContext';
 
+const getModelColor = (modelName: string) => {
+  const lowercaseName = modelName.toLowerCase();
+  if (lowercaseName.includes('claude 3.7')) return '#D97757';
+  if (lowercaseName.includes('claude 3.5')) return '#D97757';
+  if (lowercaseName.includes('gpt-4o')) return '#10B981';
+  if (lowercaseName.includes('gemini 2.0')) return '#0284C7';
+  if (lowercaseName.includes('deepseek')) return '#3B82F6';
+  if (lowercaseName.includes('o3-mini')) return '#10B981';
+  return '#999999';
+};
+
 interface ProjectDrawerProps {
   project: Project | null;
   onClose: () => void;
   onSelectBuilder?: (handle: string) => void;
   onOpenClaim: (project: Project) => void;
+  onEditProject?: (project: Project) => void;
 }
+
+const renderMarkdown = (text: string) => {
+  if (!text) return '';
+  let escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  escaped = escaped.replace(/^##\s+(.*?)$/gm, '<h4 class="font-semibold text-[#101010] mt-3 mb-1 text-[13px] lowercase">$1</h4>');
+  escaped = escaped.replace(/^#\s+(.*?)$/gm, '<h3 class="font-bold text-[#101010] mt-4 mb-2 text-[14px] lowercase">$1</h3>');
+  escaped = escaped.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noreferrer" class="text-[#0011FF] hover:underline font-medium">$1</a>');
+  escaped = escaped.replace(/^\*\s+(.*?)$/gm, '<li class="ml-4 list-disc text-[12px] my-0.5">$1</li>');
+  escaped = escaped.replace(/^-\s+(.*?)$/gm, '<li class="ml-4 list-disc text-[12px] my-0.5">$1</li>');
+  escaped = escaped.replace(/\n\n/g, '</div><div class="mt-2.5">');
+  escaped = escaped.replace(/\n/g, '<br />');
+  return `<div class="markdown-body">${escaped}</div>`;
+};
 
 // Helper to extract clean YouTube embed URL
 const getYouTubeEmbedUrl = (url?: string) => {
@@ -38,6 +67,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   onClose,
   onSelectBuilder,
   onOpenClaim,
+  onEditProject,
 }) => {
   const [copied, setCopied] = useState(false);
   const [demoMediaIndex, setDemoMediaIndex] = useState(0);
@@ -68,7 +98,6 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   if (!project) return null;
 
   const youtubeEmbedUrl = getYouTubeEmbedUrl(project.youtubeUrl || project.demoUrl);
-  const builderHandle = project.claimedBy[0] || 'ileri';
   const totalDemoSlides = 3;
 
   const nextDemoMedia = () => {
@@ -84,7 +113,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
     project.buildNotes?.whyBuilt,
     project.buildNotes?.aiRoleAndPrompts,
     project.buildNotes?.challengesAndFailures,
-  ].filter(Boolean).join(' ');
+  ].filter(Boolean).join('\n\n');
 
   const shortNotesText = fullNotesText.length > 180 
     ? fullNotesText.slice(0, 180) + '...' 
@@ -213,6 +242,19 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         <ArrowUpRight className="w-4 h-4" />
                       </a>
                     )}
+
+                    {/* Edit Project (Only if claimed by active user 'ileri') */}
+                    {project.isClaimed && project.claimedBy.some(h => h.toLowerCase() === 'ileri') && onEditProject && (
+                      <button
+                        onClick={() => onEditProject(project)}
+                        className="p-1 text-[#545454] hover:text-[#0011FF] transition-colors cursor-pointer"
+                        title="Edit project details"
+                      >
+                        <svg className="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -229,22 +271,41 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 )}
 
                 {/* Owner Tag (Pill style: 'unclaimed' when project is not claimed) */}
-                <div className="pt-1">
+                <div className="pt-1 flex items-center gap-1.5 flex-wrap">
                   {project.isClaimed ? (
-                    <button
-                      onClick={() => {
-                        onClose();
-                        if (onSelectBuilder) {
-                          onSelectBuilder(builderHandle);
-                        }
-                      }}
-                      className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1.5"
-                      title={`View @${builderHandle} profile`}
-                    >
-                      {/* Gradient Avatar Circle */}
-                      <div className={`w-3.5 h-3.5 rounded-full ${getBuilderGradient(builderHandle)} shrink-0`} />
-                      <span className="text-mono-10 !text-[#0011FF] font-medium">@{builderHandle}</span>
-                    </button>
+                    project.claimedBy && project.claimedBy.length > 0 ? (
+                      project.claimedBy.map((builder) => (
+                        <button
+                          key={builder}
+                          onClick={() => {
+                            onClose();
+                            if (onSelectBuilder) {
+                              onSelectBuilder(builder);
+                            }
+                          }}
+                          className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1.5"
+                          title={`View @${builder} profile`}
+                        >
+                          {/* Gradient Avatar Circle */}
+                          <div className={`w-3.5 h-3.5 rounded-full ${getBuilderGradient(builder)} shrink-0`} />
+                          <span className="text-mono-10 !text-[#0011FF] font-medium">@{builder}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <button
+                        onClick={() => {
+                          onClose();
+                          if (onSelectBuilder) {
+                            onSelectBuilder('ileri');
+                          }
+                        }}
+                        className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1.5"
+                        title="View @ileri profile"
+                      >
+                        <div className={`w-3.5 h-3.5 rounded-full ${getBuilderGradient('ileri')} shrink-0`} />
+                        <span className="text-mono-10 !text-[#0011FF] font-medium">@ileri</span>
+                      </button>
+                    )
                   ) : (
                     <button
                       onClick={() => onOpenClaim(project)}
@@ -267,10 +328,22 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   stack
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {project.aiTools.map((toolId) => (
+                  {/* First render AI Tools */}
+                  {project.aiTools && project.aiTools.map((toolId) => (
                     <div key={toolId} className="tool-pill">
                       <ToolLogo toolId={toolId} size={11} />
                       <span className="text-mono-10 capitalize">{toolId.replace('-', ' ')}</span>
+                    </div>
+                  ))}
+                  
+                  {/* Next render AI Models */}
+                  {project.aiModel && project.aiModel.split(',').map(m => m.trim()).filter(Boolean).map((modelName) => (
+                    <div key={modelName} className="tool-pill">
+                      <div
+                        className="w-1.5 h-1.5 shrink-0"
+                        style={{ backgroundColor: getModelColor(modelName) }}
+                      />
+                      <span className="text-mono-10">{modelName}</span>
                     </div>
                   ))}
                 </div>
@@ -281,14 +354,16 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 <span className="block text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal mb-1.5">
                   build notes
                 </span>
-                <div className="text-inter-14 text-[#545454] leading-relaxed text-[13px]">
-                  <span>
-                    {isBuildNotesExpanded ? fullNotesText : shortNotesText}
-                  </span>
+                <div className="text-inter-14 text-[#545454] leading-relaxed text-[13px] space-y-1">
+                  <div 
+                    dangerouslySetInnerHTML={{ 
+                      __html: renderMarkdown(isBuildNotesExpanded ? fullNotesText : shortNotesText) 
+                    }} 
+                  />
                   {fullNotesText.length > 180 && (
                     <button
                       onClick={() => setIsBuildNotesExpanded(!isBuildNotesExpanded)}
-                      className="ml-1 text-[#101010] font-medium hover:underline cursor-pointer inline-block"
+                      className="text-[#101010] font-semibold hover:underline cursor-pointer inline-block mt-1"
                     >
                       {isBuildNotesExpanded ? 'see less' : 'see more'}
                     </button>
