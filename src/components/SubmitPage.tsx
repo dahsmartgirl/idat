@@ -146,7 +146,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   const [buildNotesTouched, setBuildNotesTouched] = useState(false);
 
   // Media states
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string>('');
   const coverImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -194,7 +193,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       setBuildNotesText(editingProject.buildNotes?.whyBuilt || '');
       setMediaOption(editingProject.youtubeUrl ? 'youtube' : 'upload');
       setUploadedFile(null);
-      setCoverImageFile(null);
       setCoverImagePreview('');
       
       setNameTouched(false);
@@ -218,7 +216,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       setBuildNotesText('');
       setMediaOption('youtube');
       setUploadedFile(null);
-      setCoverImageFile(null);
       setCoverImagePreview('');
 
       setNameTouched(false);
@@ -278,7 +275,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       setModelsTouched(false);
       setBuildNotesTouched(false);
     } else {
-      setCoverImageFile(null);
       setCoverImagePreview('');
       setYoutubeUrl('');
       setUploadedFile(null);
@@ -344,7 +340,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setCoverImageFile(file);
       setCoverImagePreview(URL.createObjectURL(file));
     }
   };
@@ -364,7 +359,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
 
   const handleRemoveCoverFile = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCoverImageFile(null);
     setCoverImagePreview('');
     if (coverImageInputRef.current) coverImageInputRef.current.value = '';
   };
