@@ -77,7 +77,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep, totalSteps, onStepClick,
                 {isCompleted ? '✓' : s}
               </div>
               <span className={`text-[11.5px] font-sans transition-colors lowercase ${
-                isActive || isCompleted ? 'text-[#101010] font-medium' : 'text-[#777777]'
+                isActive || isCompleted ? 'text-[#101010] font-normal' : 'text-[#777777] font-normal'
               }`}>
                 {s === 1 ? 'details & notes' : s === 2 ? 'media assets' : 'preview'}
               </span>
@@ -541,7 +541,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
               className="submit-back-btn"
               title="Go back to feed"
             >
-              <ArrowLeft className="w-5 h-5 stroke-[2]" />
+               <ArrowLeft className="w-[18px] h-[18px]" strokeWidth={1.5} />
             </button>
           </div>
 
@@ -590,7 +590,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             className={`submit-input-text ${nameHasError ? 'error' : ''}`}
                           />
                           {nameHasError && (
-                            <span className="text-[11px] text-red-500 mt-1 block font-sans lowercase">name is required</span>
+                            <span className="text-[11px] text-red-500 mt-1 block font-sans font-normal lowercase">name is required</span>
                           )}
                         </div>
 
@@ -648,7 +648,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                           className={`submit-input-text ${taglineHasError ? 'error' : ''}`}
                         />
                         {taglineHasError && (
-                          <span className="text-[11px] text-red-500 mt-1 block font-sans lowercase">tagline is required</span>
+                          <span className="text-[11px] text-red-500 mt-1 block font-sans font-normal lowercase">one-liner tagline is required</span>
                         )}
                       </div>
 
@@ -680,8 +680,8 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             className={`submit-input-text ${demoUrlHasError ? 'error' : ''}`}
                           />
                           {demoUrlHasError && (
-                            <span className="text-[11px] text-red-500 mt-1 block font-sans lowercase">live link is required</span>
-                          )}
+                          <span className="text-[11px] text-red-500 mt-1 block font-sans font-normal lowercase">live link is required</span>
+                        )}
                         </div>
 
                         <div>
@@ -706,7 +706,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             placeholder="https://"
                             className="submit-input-text"
                           />
-                          <p className="text-[11px] text-[#999999] mt-1 font-sans lowercase">input link to code repository or shared tool builder editor link</p>
+                          <p className="text-[11px] text-[#999999] mt-1 font-sans font-normal lowercase">input link to code repository or shared tool builder editor link</p>
                         </div>
                       </div>
 
@@ -801,7 +801,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             </div>
                           )}
                         </div>
-                        <p className={`text-[11px] mt-1 font-sans lowercase ${creatorsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
+                        <p className={`text-[11px] mt-1 font-sans font-normal lowercase ${creatorsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
                           {creatorsHasError ? 'at least one builder is required' : 'type username and press enter or space to add creators'}
                         </p>
                       </div>
@@ -893,7 +893,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                               </div>
                             )}
                           </div>
-                          <p className={`text-[11px] mt-1 font-sans lowercase ${toolsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
+                          <p className={`text-[11px] mt-1 font-sans font-normal lowercase ${toolsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
                             {toolsHasError ? 'at least one tool is required' : 'type tool and press enter to add'}
                           </p>
                         </div>
@@ -986,7 +986,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                               </div>
                             )}
                           </div>
-                          <p className={`text-[11px] mt-1 font-sans lowercase ${modelsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
+                          <p className={`text-[11px] mt-1 font-sans font-normal lowercase ${modelsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
                             {modelsHasError ? 'at least one model is required' : 'type model and press enter to add'}
                           </p>
                         </div>
@@ -1007,9 +1007,9 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                           placeholder="you can explain why you built this, prompts, challenges faced, etc. here"
                           className={`submit-textarea ${buildNotesHasError ? 'error' : ''}`}
                         />
-                        {buildNotesHasError && (
-                          <span className="text-[11px] text-red-500 mt-1 block font-sans lowercase">build notes are required</span>
-                        )}
+                         {buildNotesHasError && (
+                           <span className="text-[11px] text-red-500 mt-1 block font-sans font-normal lowercase">build notes are required</span>
+                         )}
                       </div>
 
                     </div>

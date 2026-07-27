@@ -348,6 +348,7 @@ select {
   color: #101010 !important;
   font-size: 12px !important;
   font-family: 'Inter', sans-serif !important;
+  font-weight: 400 !important;
   text-transform: lowercase !important;
   text-align: left !important;
   border: none !important;
@@ -379,6 +380,7 @@ select {
   text-align: left !important;
   font-size: 12px !important;
   font-family: 'Inter', sans-serif !important;
+  font-weight: 400 !important;
   text-transform: lowercase !important;
   color: #101010 !important;
   background: transparent !important;
@@ -502,6 +504,8 @@ select {
   padding: 8px 12px !important;
   text-align: left !important;
   font-size: 11px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 400 !important;
   color: #101010 !important;
   background: transparent !important;
   border: none !important;
