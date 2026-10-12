@@ -390,6 +390,13 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Enter in a step 1 field submits the form; treat it as "next step" instead of saving
+    if (step === 1) {
+      handleNextStep();
+      return;
+    }
+
     setNameTouched(true);
     setTaglineTouched(true);
     setDemoUrlTouched(true);
@@ -1193,6 +1200,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                     {/* Stepping controls */}
                     {step === 1 ? (
                       <button
+                        key="next-step"
                         type="button"
                         onClick={handleNextStep}
                         className="btn-main !h-[30px] relative overflow-hidden flex items-center justify-center gap-1 group font-sans text-[11px] font-medium cursor-pointer px-4 rounded-full"
@@ -1215,6 +1223,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       </button>
                     ) : (
                       <button
+                        key="submit"
                         type="submit"
                         className="btn-main !h-[30px] relative overflow-hidden flex items-center justify-center gap-1 group font-sans text-[11px] font-medium cursor-pointer px-4 rounded-full"
                       >
