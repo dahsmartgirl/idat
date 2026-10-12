@@ -223,7 +223,7 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
 
       {/* Description / Tagline */}
       {project.tagline && (
-        <p className="text-inter-14 text-secondary text-[13px] leading-snug">
+        <p className="text-inter-14 text-subtext text-[13px] leading-snug">
           {project.tagline}
         </p>
       )}
@@ -313,7 +313,7 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
       <span className="block text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal mb-1.5">
         build notes
       </span>
-      <div className="text-inter-14 text-secondary leading-relaxed text-[13px] space-y-1">
+      <div className="text-inter-14 text-subtext leading-relaxed text-[13px] space-y-1">
         <div 
           dangerouslySetInnerHTML={{ 
             __html: renderMarkdown(isBuildNotesExpanded ? fullNotesText : shortNotesText) 

@@ -126,7 +126,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 className="absolute left-0"
               >
                 {!project.isClaimed && <UnclaimedBanner project={project} onOpenClaim={onOpenClaim} />}
-                <div className="w-full max-w-[860px] mx-auto p-6 sm:p-8 space-y-5">
+                <div className="w-full max-w-[860px] mx-auto px-4 sm:px-8 pt-6 sm:pt-8 space-y-5">
                   <ProjectDetails
                     project={project}
                     onSelectBuilder={onSelectBuilder}

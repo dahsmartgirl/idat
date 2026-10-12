@@ -195,7 +195,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
         </div>
 
         {/* Description / One-liner */}
-        <p className="text-inter-14 line-clamp-2 leading-tight min-h-[14px]">
+        <p className="text-inter-14 text-subtext line-clamp-2 leading-tight min-h-[14px]">
           {project.tagline ? (
             project.tagline
           ) : (

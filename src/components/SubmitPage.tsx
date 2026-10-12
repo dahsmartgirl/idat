@@ -869,9 +869,9 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             </div>
                           )}
                         </div>
-                        <p className={`text-[11px] mt-1 font-sans font-normal lowercase ${creatorsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
-                          {creatorsHasError ? 'at least one builder is required' : 'type username and press enter or space to add creators'}
-                        </p>
+                        {creatorsHasError && (
+                          <p className="text-[11px] mt-1 font-sans font-normal lowercase text-red-500">at least one builder is required</p>
+                        )}
                       </div>
 
                       {/* AI Stack - Visual ordering: AI Tools (built with) first, AI Models second */}
@@ -937,7 +937,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                                 onBlur={() => {
                                   setTimeout(() => setToolsTouched(true), 200);
                                 }}
-                                placeholder={selectedTools.length === 0 ? "e.g. cursor" : ""}
+                                placeholder={selectedTools.length === 0 ? "e.g. claude code, cursor, lovable" : ""}
                                 className="flex-1 bg-transparent border-none outline-none text-[12px] font-sans placeholder:text-[#999999] min-w-[80px]"
                               />
                             </div>
@@ -961,9 +961,9 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                               </div>
                             )}
                           </div>
-                          <p className={`text-[11px] mt-1 font-sans font-normal lowercase ${toolsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
-                            {toolsHasError ? 'at least one tool is required' : 'type tool and press enter to add'}
-                          </p>
+                          {toolsHasError && (
+                            <p className="text-[11px] mt-1 font-sans font-normal lowercase text-red-500">at least one tool is required</p>
+                          )}
                         </div>
 
                         {/* AI Models with Autocomplete Suggestions */}
@@ -1027,7 +1027,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                                 onBlur={() => {
                                   setTimeout(() => setModelsTouched(true), 200);
                                 }}
-                                placeholder={selectedModels.length === 0 ? "e.g. claude 3.7 sonnet" : ""}
+                                placeholder={selectedModels.length === 0 ? "e.g. claude opus 5.5, gpt-6.1 sol" : ""}
                                 className="flex-1 bg-transparent border-none outline-none text-[12px] font-sans placeholder:text-[#999999] min-w-[80px]"
                               />
                             </div>
@@ -1051,9 +1051,9 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                               </div>
                             )}
                           </div>
-                          <p className={`text-[11px] mt-1 font-sans font-normal lowercase ${modelsHasError ? 'text-red-500' : 'text-[#999999]'}`}>
-                            {modelsHasError ? 'at least one model is required' : 'type model and press enter to add'}
-                          </p>
+                          {modelsHasError && (
+                            <p className="text-[11px] mt-1 font-sans font-normal lowercase text-red-500">at least one model is required</p>
+                          )}
                         </div>
                       </div>
 

@@ -50,7 +50,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ projects, onSelectBuil
       className="w-full -mt-2"
     >
       {!project.isClaimed && <UnclaimedBanner project={project} onOpenClaim={onOpenClaim} />}
-      <div className="w-full max-w-[860px] mx-auto px-6 sm:px-8 pt-6 sm:pt-8 pb-16 space-y-5">
+      <div className="w-full max-w-[860px] mx-auto px-4 sm:px-8 pt-6 sm:pt-8 pb-16 space-y-5">
         <ProjectDetails
           key={project.id}
           project={project}

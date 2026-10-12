@@ -130,7 +130,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
 
                           <div className="min-w-0 flex-1 flex flex-col gap-1 pr-6">
                             <h4 className="text-inter-16 truncate">{project.name}</h4>
-                            <p className="text-inter-14 line-clamp-2 leading-snug text-pretty">{project.tagline}</p>
+                            <p className="text-inter-14 text-subtext line-clamp-2 leading-snug text-pretty">{project.tagline}</p>
                             <div className="flex items-center gap-1 mt-auto pt-0.5 min-w-0">
                               {firstTool && (
                                 <span className="tool-pill shrink-0">
