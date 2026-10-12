@@ -312,7 +312,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
           exit={isMobile ? { y: '100%' } : { opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
           className={`
-            relative bg-[#F2F1F3] text-[#545454] rounded-none shadow-2xl flex flex-col z-50 overflow-visible border-none
+            relative bg-page text-secondary rounded-none shadow-2xl flex flex-col z-50 overflow-visible border-none
             ${isMobile 
               ? 'w-full max-h-[85vh] h-[85vh] self-end mt-auto' 
               : 'w-full max-w-2xl max-h-[90vh]'
@@ -333,8 +333,8 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
           </motion.button>
 
           {/* Header (No dividers) */}
-          <div className="px-6 pt-7 pb-4 bg-[#F2F1F3] shrink-0">
-            <h2 className="text-inter-20 text-[#545454] lowercase tracking-normal">
+          <div className="px-6 pt-7 pb-4 bg-page shrink-0">
+            <h2 className="text-inter-20 text-secondary lowercase tracking-normal">
               {isClaiming 
                 ? `claim thing: ${name}` 
                 : isEditing 
@@ -359,7 +359,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                 <p className="text-mono-10">recorded on idat.xyz</p>
               </div>
             ) : (
-              <form id="submit-form" onSubmit={handleSubmit} className="space-y-4 text-inter-14 text-[#545454]">
+              <form id="submit-form" onSubmit={handleSubmit} className="space-y-4 text-inter-14 text-secondary">
                 
                 {/* ----------------- MODE B: CLAIM MODE FORM ----------------- */}
                 {isClaiming ? (
@@ -433,7 +433,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                         onClick={handleUploadBoxClick}
                         className="w-full h-24 border border-dashed border-[#C2C2C2] bg-[#E9E9E9]/50 flex flex-col items-center justify-center text-center p-4 select-none cursor-pointer rounded-[8px] hover:bg-[#E9E9E9] transition-colors mt-1"
                       >
-                        <Upload className="w-4 h-4 text-[#545454] mb-1" />
+                        <Upload className="w-4 h-4 text-secondary mb-1" />
                         <span className="text-inter-14 text-[11px]">
                           {uploadedFile 
                             ? `Selected: ${uploadedFile.name}` 
@@ -480,7 +480,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                           className="w-full h-[38px] px-4 bg-[#E9E9E9] text-[#101010] text-[12px] text-left border-none outline-none font-sans rounded-full flex items-center justify-between cursor-pointer"
                         >
                           <span>{category}</span>
-                          <ChevronDown className="w-4 h-4 text-[#545454]" />
+                          <ChevronDown className="w-4 h-4 text-secondary" />
                         </button>
                         
                         {isCategoryOpen && (
@@ -536,7 +536,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                         onClick={() => coverImageInputRef.current?.click()}
                         className="w-full h-20 border border-dashed border-[#C2C2C2] bg-[#E9E9E9]/50 flex flex-col items-center justify-center text-center p-2 select-none cursor-pointer rounded-[8px] hover:bg-[#E9E9E9] transition-colors"
                       >
-                        <Upload className="w-4 h-4 text-[#545454] mb-1" />
+                        <Upload className="w-4 h-4 text-secondary mb-1" />
                         <span className="text-inter-14 text-[11px]">
                           {coverImageFile ? `Selected: ${coverImageFile.name}` : 'Click to select project cover image'}
                         </span>
@@ -593,14 +593,14 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                           <button
                             type="button"
                             onClick={() => setMediaOption('youtube')}
-                            className={`px-2.5 py-0.5 rounded-full ${mediaOption === 'youtube' ? 'bg-[#101010] text-white' : 'text-[#545454]'}`}
+                            className={`px-2.5 py-0.5 rounded-full ${mediaOption === 'youtube' ? 'bg-[#101010] text-white' : 'text-secondary'}`}
                           >
                             youtube
                           </button>
                           <button
                             type="button"
                             onClick={() => setMediaOption('upload')}
-                            className={`px-2.5 py-0.5 rounded-full ${mediaOption === 'upload' ? 'bg-[#101010] text-white' : 'text-[#545454]'}`}
+                            className={`px-2.5 py-0.5 rounded-full ${mediaOption === 'upload' ? 'bg-[#101010] text-white' : 'text-secondary'}`}
                           >
                             upload
                           </button>
@@ -629,7 +629,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                             onClick={handleUploadBoxClick}
                             className="w-full h-24 border border-dashed border-[#C2C2C2] bg-[#E9E9E9]/50 flex flex-col items-center justify-center text-center p-4 select-none cursor-pointer rounded-[8px] hover:bg-[#E9E9E9] transition-colors"
                           >
-                            <Upload className="w-4 h-4 text-[#545454] mb-1" />
+                            <Upload className="w-4 h-4 text-secondary mb-1" />
                             <span className="text-inter-14 text-[11px]">
                               {uploadedFile 
                                 ? `Selected: ${uploadedFile.name}` 
@@ -799,7 +799,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
 
           {/* Footer (No border lines, fixed submit button hugging content + clear button on the right) */}
           {!submitted && (
-            <div className="px-6 py-4 bg-[#F2F1F3] shrink-0 w-full flex items-center justify-end gap-3.5">
+            <div className="px-6 py-4 bg-page shrink-0 w-full flex items-center justify-end gap-3.5">
               <button
                 type="button"
                 onClick={handleClear}

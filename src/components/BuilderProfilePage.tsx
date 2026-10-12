@@ -246,8 +246,8 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
               </div>
 
               {/* builder #42: Number touches # directly (gap removed), number in #0011FF */}
-              <div className="text-inter-14 !text-[#545454] flex items-baseline">
-                <span className="text-[#545454]">builder #</span>
+              <div className="text-inter-14 !text-secondary flex items-baseline">
+                <span className="text-secondary">builder #</span>
                 <ScrambleNumber value={builder.foundingNumber || 42} color="#0011FF" />
               </div>
 
@@ -259,7 +259,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
                   href={`https://github.com/${builder.username}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[#545454] hover:text-[#101010] transition-colors"
+                  className="text-secondary hover:text-[#101010] transition-colors"
                   title="GitHub Profile"
                 >
                   <Github className="w-3.5 h-3.5" />
@@ -270,7 +270,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
                   href={`https://x.com/${builder.username}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[#545454] hover:text-[#101010] transition-colors"
+                  className="text-secondary hover:text-[#101010] transition-colors"
                   title="Twitter / X Profile"
                 >
                   <XLogo className="w-3.5 h-3.5" />
@@ -279,12 +279,12 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
                 {/* Personal Domain Link alone (e.g. "ileri.dev") matching bio font size text-inter-14 */}
                 {builder.websiteUrl && (
                   <>
-                    <span className="text-[#545454]">•</span>
+                    <span className="text-secondary">•</span>
                     <a
                       href={builder.websiteUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="!text-[#545454] font-normal text-inter-14 hover:underline transition-colors"
+                      className="!text-secondary font-normal text-inter-14 hover:underline transition-colors"
                     >
                       {cleanHandle === 'ileri' ? 'ileri.dev' : builder.websiteUrl.replace('https://', '').replace('http://', '')}
                     </a>
@@ -301,7 +301,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
           <div className="space-y-2 pt-1">
             {/* Bio (text-inter-14) */}
             {builder.bio && (
-              <p className="text-inter-14 text-[#545454] max-w-2xl leading-relaxed">
+              <p className="text-inter-14 text-secondary max-w-2xl leading-relaxed">
                 {builder.bio}
               </p>
             )}
@@ -325,10 +325,10 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
           {/* Row: "3 things." (Solid #545454 grey text) + Filter Button */}
           <div className="px-4 sm:px-8 py-2 flex items-center justify-between">
             <div className="flex items-baseline gap-1">
-              <span className="text-mono-20 text-[#545454]">
-                <ScrambleNumber value={filteredBuilderProjects.length} color="#545454" />
+              <span className="text-mono-20 text-secondary">
+                <ScrambleNumber value={filteredBuilderProjects.length} color="var(--color-secondary)" />
               </span>
-              <span className="text-inter-20 text-[#545454]">
+              <span className="text-inter-20 text-secondary">
                 {filteredBuilderProjects.length === 1 ? 'thing.' : 'things.'}
               </span>
             </div>

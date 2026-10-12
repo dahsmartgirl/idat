@@ -144,7 +144,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 onClose();
               }
             }}
-            className="relative w-[calc(100vw-64px)] sm:w-[540px] max-w-[540px] h-full bg-[#F2F1F3] shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
+            className="relative w-[calc(100vw-64px)] sm:w-[540px] max-w-[540px] h-full bg-page shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
           >
             
             {/* Big Solid White Floating X Pill Button matching FilterDrawer 1:1 */}
@@ -187,7 +187,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   
                   {/* Left: Expand View Icon */}
                   <button
-                    className="p-1 text-[#545454] hover:text-[#101010] transition-colors cursor-pointer -ml-1"
+                    className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer -ml-1"
                     title="Expand view"
                   >
                     <Maximize2 className="w-4 h-4" />
@@ -198,7 +198,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     {/* Bookmark */}
                     <button
                       onClick={() => toggleFavorite(project.id)}
-                      className="p-1 text-[#545454] hover:text-[#101010] transition-colors cursor-pointer"
+                      className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
                       title="Bookmark"
                     >
                       <Bookmark className={`w-4 h-4 ${favorited ? 'fill-current text-[#101010]' : ''}`} />
@@ -207,7 +207,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     {/* Copy Link */}
                     <button
                       onClick={handleShare}
-                      className="p-1 text-[#545454] hover:text-[#101010] transition-colors cursor-pointer"
+                      className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
                       title="Copy link"
                     >
                       {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -219,7 +219,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         href={project.githubUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-1 text-[#545454] hover:text-[#101010] transition-colors cursor-pointer"
+                        className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
                         title="Remix / Source Code"
                       >
                         <GitFork className="w-4 h-4" />
@@ -232,7 +232,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         href={project.demoUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-1 text-[#545454] hover:text-[#101010] transition-colors cursor-pointer"
+                        className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
                         title="Visit live link"
                       >
                         <ArrowUpRight className="w-4 h-4" />
@@ -243,7 +243,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                     {project.isClaimed && project.claimedBy.some(h => h.toLowerCase() === 'ileri') && onEditProject && (
                       <button
                         onClick={() => onEditProject(project)}
-                        className="p-1 text-[#545454] hover:text-[#0011FF] transition-colors cursor-pointer"
+                        className="p-1 text-secondary hover:text-[#0011FF] transition-colors cursor-pointer"
                         title="Edit project details"
                       >
                         <Edit className="w-4 h-4" />
@@ -259,7 +259,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
                 {/* Description / Tagline */}
                 {project.tagline && (
-                  <p className="text-inter-14 text-[#545454] text-[13px] leading-snug">
+                  <p className="text-inter-14 text-secondary text-[13px] leading-snug">
                     {project.tagline}
                   </p>
                 )}
@@ -306,7 +306,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1"
                       title="Claim this project"
                     >
-                      <span className="text-mono-10 !text-[#545454]">unclaimed</span>
+                      <span className="text-mono-10 !text-secondary">unclaimed</span>
                     </button>
                   )}
                 </div>
@@ -349,7 +349,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 <span className="block text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal mb-1.5">
                   build notes
                 </span>
-                <div className="text-inter-14 text-[#545454] leading-relaxed text-[13px] space-y-1">
+                <div className="text-inter-14 text-secondary leading-relaxed text-[13px] space-y-1">
                   <div 
                     dangerouslySetInnerHTML={{ 
                       __html: renderMarkdown(isBuildNotesExpanded ? fullNotesText : shortNotesText) 

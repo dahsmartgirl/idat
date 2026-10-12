@@ -139,7 +139,7 @@ export const ProjectMasonry = React.memo<ProjectMasonryProps>(function ProjectMa
           <h3 className="text-inter-16 !text-[#101010] font-medium tracking-tight">
             {searchQuery ? `no things found for "${searchQuery}"` : 'no matching things'}
           </h3>
-          <p className="text-inter-14 text-[#545454]/70 max-w-xs leading-relaxed">
+          <p className="text-inter-14 text-secondary/70 max-w-xs leading-relaxed">
             Try clearing your search query or adjusting your filters.
           </p>
 

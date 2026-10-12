@@ -161,7 +161,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                 onClose();
               }
             }}
-            className="relative w-[calc(100vw-64px)] sm:w-[370px] max-w-[370px] h-full bg-[#F2F1F3] shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
+            className="relative w-[calc(100vw-64px)] sm:w-[370px] max-w-[370px] h-full bg-page shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
           >
             
             {/* Solid White Floating X Button */}
@@ -178,9 +178,9 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
             </motion.button>
 
             {/* Drawer Header */}
-            <div className="px-5 sm:px-7 pt-6 sm:pt-7 pb-2 flex items-center justify-between bg-[#F2F1F3]">
+            <div className="px-5 sm:px-7 pt-6 sm:pt-7 pb-2 flex items-center justify-between bg-page">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <h2 className="text-inter-20 !text-[#545454] tracking-tight">
+                <h2 className="text-inter-20 !text-secondary tracking-tight">
                   filter
                 </h2>
                 {activeCount > 0 && (

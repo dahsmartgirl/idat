@@ -57,7 +57,7 @@ const Stepper: React.FC<StepperProps> = ({ currentStep, totalSteps, onStepClick,
                     ? 'bg-[#0011FF] text-white font-bold' 
                     : isActive 
                       ? 'border border-[#0011FF] text-[#0011FF] font-semibold bg-transparent' 
-                      : 'bg-[#D0D0D0] text-[#545454]'
+                      : 'bg-[#D0D0D0] text-secondary'
                 }`}
               >
                 {isCompleted ? '✓' : s}
@@ -626,7 +626,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             
             {/* LEFT PANEL: INPUT FIELDS (Edits column - Constrained content width) */}
-            <div className="bg-[#F2F1F3] flex flex-col overflow-visible">
+            <div className="bg-page flex flex-col overflow-visible">
               <div className="w-full max-w-full md:max-w-md">
                 <form id="submission-page-form" onSubmit={handleSubmit} className="space-y-4">
                   
@@ -671,7 +671,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             className="submit-dropdown-btn"
                           >
                             <span>{category}</span>
-                            <ChevronDown className="w-4 h-4 text-[#545454]" />
+                            <ChevronDown className="w-4 h-4 text-secondary" />
                           </button>
                           
                           {isCategoryOpen && (
@@ -1156,7 +1156,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                   )}
 
                   {/* Page Navigation Footer (fixed/sticky actions, content hugging) */}
-                  <div className="py-0.5 mt-1 flex items-center justify-end gap-2 bg-[#F2F1F3] w-full shrink-0">
+                  <div className="py-0.5 mt-1 flex items-center justify-end gap-2 bg-page w-full shrink-0">
                     <button
                       type="button"
                       onClick={handleClear}

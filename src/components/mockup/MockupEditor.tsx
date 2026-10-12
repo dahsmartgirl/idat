@@ -178,7 +178,7 @@ export const MockupEditor: React.FC<MockupEditorProps> = ({
                   className={`mockup-swatch relative flex items-center justify-center cursor-pointer ${isCustomColor ? 'active' : ''}`}
                   style={{ background: isCustomColor ? settings.background : '#E9E9E9' }}
                 >
-                  {!isCustomColor && <Plus className="w-3 h-3 text-[#545454]" />}
+                  {!isCustomColor && <Plus className="w-3 h-3 text-secondary" />}
                   <input
                     type="color"
                     value={isCustomColor ? settings.background : '#F2F1F3'}

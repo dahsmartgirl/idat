@@ -207,7 +207,7 @@ function AppLayout() {
   }, [activeProject, isFilterDrawerOpen, isFavoritesOpen, windowWidth]);
 
   return (
-    <div className="min-h-screen bg-[#F2F1F3] text-[#545454] flex flex-col font-sans w-full overflow-x-clip relative">
+    <div className="min-h-screen bg-page text-secondary flex flex-col font-sans w-full overflow-x-clip relative">
       
       {/* Main Page Content Wrapper (Smoothly pushed left for both mobile & desktop drawers) */}
       <motion.div

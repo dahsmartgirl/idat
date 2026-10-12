@@ -53,7 +53,7 @@ export const ToolFilterBar: React.FC<ToolFilterBarProps> = ({
   const numberVal = 300;
 
   return (
-    <div className="w-full flex items-center justify-between px-4 sm:px-8 py-4 bg-[#F2F1F3]">
+    <div className="w-full flex items-center justify-between px-4 sm:px-8 py-4 bg-page">
       {/* 300 (Cascadia Mono 16px) + things. (Inter 16px) */}
       <div className="flex items-baseline gap-1">
         <span className="text-mono-20 cursor-pointer" title="300 things">

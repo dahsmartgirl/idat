@@ -73,7 +73,7 @@ export const ShotStrip: React.FC<ShotStripProps> = ({
           {...dropHandlers}
           className={`submit-dropzone !h-[132px] select-none ${isDragOver ? '!bg-[#E9E9E9] !border-[#545454]' : ''}`}
         >
-          <Upload className="w-4 h-4 text-[#545454] mb-1.5" />
+          <Upload className="w-4 h-4 text-secondary mb-1.5" />
           <span className="text-inter-14 !text-[11px]">
             {isLoading ? 'framing your media...' : 'drop images or videos here, or click to browse'}
           </span>
@@ -127,7 +127,7 @@ export const ShotStrip: React.FC<ShotStripProps> = ({
             aria-label="Add images or videos"
             className="w-[56px] h-[56px] border border-dashed border-[#C2C2C2] bg-[#E9E9E9]/50 hover:bg-[#E9E9E9] flex items-center justify-center cursor-pointer transition-colors"
           >
-            <Plus className="w-4 h-4 text-[#545454]" />
+            <Plus className="w-4 h-4 text-secondary" />
           </button>
         )}
       </div>

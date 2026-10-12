@@ -39,7 +39,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
   // Bookmark sits on the mockup's background: white on dark backgrounds, near-black on light ones,
   // and the usual grey on the plain grey block
   const bookmarkColor = !coverShot
-    ? 'text-[#545454]'
+    ? 'text-secondary'
     : isDarkBackground(coverShot.settings.background)
       ? 'text-white drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.35)]'
       : 'text-[#101010]';
@@ -48,7 +48,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
 
   return (
     <div 
-      className="w-full flex flex-col gap-2 cursor-pointer group text-[#545454]"
+      className="w-full flex flex-col gap-2 cursor-pointer group text-secondary"
       onClick={() => onSelectProject(project)}
     >
       {/* Grey Block (#D9D9D9) */}
@@ -125,7 +125,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
                           }
                         }}
                         style={{ zIndex: idx + 1 }}
-                        className={`w-[16px] h-[16px] rounded-full outline-2 outline-[#F2F1F3] hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(builder)}`} 
+                        className={`w-[16px] h-[16px] rounded-full outline-2 outline-page hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(builder)}`} 
                         title={`Claimed by @${builder} (Click to view profile)`}
                       />
                     ))
@@ -141,13 +141,13 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
                             }
                           }}
                           style={{ zIndex: idx + 1 }}
-                          className={`w-[16px] h-[16px] rounded-full outline-2 outline-[#F2F1F3] hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(builder)}`} 
+                          className={`w-[16px] h-[16px] rounded-full outline-2 outline-page hover:scale-110 transition-transform cursor-pointer ${getBuilderGradient(builder)}`} 
                           title={`Claimed by @${builder} (Click to view profile)`}
                         />
                       ))}
                       <div
                         style={{ zIndex: 3 }}
-                        className="w-[16px] h-[16px] rounded-full outline-2 outline-[#F2F1F3] bg-[#D9D9D9] flex items-center justify-center text-[7.5px] font-sans font-bold text-[#545454] select-none shrink-0"
+                        className="w-[16px] h-[16px] rounded-full outline-2 outline-page bg-[#D9D9D9] flex items-center justify-center text-[7.5px] font-sans font-bold text-secondary select-none shrink-0"
                         title={`${project.claimedBy.length - 2} more builders`}
                       >
                         +{project.claimedBy.length - 2}
@@ -186,7 +186,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
               target="_blank"
               rel="noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="text-[#545454]/70 hover:text-black shrink-0 p-0.5"
+              className="text-secondary/70 hover:text-black shrink-0 p-0.5"
               title="Visit site"
             >
               <ArrowUpRight className="w-3.5 h-3.5" />

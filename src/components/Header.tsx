@@ -77,7 +77,7 @@ const DynamicSearchInput: React.FC<DynamicSearchInputProps> = ({
   return (
     <div className="relative w-full flex items-center">
       {/* Search Icon */}
-      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#545454]/70 z-10">
+      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-secondary/70 z-10">
         <Search className="w-3.5 h-3.5" />
       </div>
 
@@ -96,7 +96,7 @@ const DynamicSearchInput: React.FC<DynamicSearchInputProps> = ({
       {/* Typewriter Effect Placeholder (Reverted Cursor to standard bg-[#545454]/70) */}
       {value === '' && !isFocused && (
         <div className="absolute left-9 top-1/2 -translate-y-1/2 pointer-events-none z-10 flex items-center select-none">
-          <span className="text-[#545454]/75 font-sans text-[13px] font-normal">
+          <span className="text-secondary/75 font-sans text-[13px] font-normal">
             {displayedText}
           </span>
           <span className="w-[1.5px] h-3.5 bg-[#545454]/70 ml-[2px] animate-pulse inline-block" />
@@ -107,7 +107,7 @@ const DynamicSearchInput: React.FC<DynamicSearchInputProps> = ({
       {onCloseMobile && (
         <button
           onClick={onCloseMobile}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#545454] hover:text-black transition-colors z-20"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-secondary hover:text-black transition-colors z-20"
           title="Close search"
         >
           <X className="w-3.5 h-3.5" />
@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
-    <header className="w-full px-4 sm:px-8 h-[64px] sm:h-[68px] pt-2 sm:pt-3 flex items-center justify-between bg-[#F2F1F3] sticky top-0 z-30 overflow-hidden shrink-0">
+    <header className="w-full px-4 sm:px-8 h-[64px] sm:h-[68px] pt-2 sm:pt-3 flex items-center justify-between bg-page sticky top-0 z-30 overflow-hidden shrink-0">
       
       {/* 1. Left Section: Logo -> Links back to mainpage (/) */}
       <motion.div
@@ -193,7 +193,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Mobile Search Icon Button */}
         <button
           onClick={() => setMobileSearchOpen(true)}
-          className="sm:hidden text-[#545454] hover:opacity-80 transition-opacity p-1"
+          className="sm:hidden text-secondary hover:opacity-80 transition-opacity p-1"
           title="Open Search"
         >
           <Search className="w-[18px] h-[18px]" strokeWidth={1.5} />
@@ -202,7 +202,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Bookmark Icon */}
         <button
           onClick={onOpenFavorites}
-          className="relative text-[#545454] hover:opacity-80 transition-opacity p-1"
+          className="relative text-secondary hover:opacity-80 transition-opacity p-1"
           title="Bookmarked Favorites"
         >
           <Bookmark className={`w-[18px] h-[18px] ${favorites.length > 0 ? 'fill-[#545454]' : ''}`} strokeWidth={1.5} />

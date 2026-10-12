@@ -56,7 +56,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
                 onClose();
               }
             }}
-            className="relative w-[calc(100vw-64px)] sm:w-[370px] max-w-[370px] h-full bg-[#F2F1F3] shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
+            className="relative w-[calc(100vw-64px)] sm:w-[370px] max-w-[370px] h-full bg-page shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
           >
 
             {/* Big Solid White Floating X Pill Button matching FilterDrawer 1:1 */}
@@ -76,7 +76,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
             {/* Drawer Header (matches FilterDrawer: title + count badge, no divider) */}
             <div className="px-5 sm:px-7 pt-6 sm:pt-7 pb-4">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <h2 className="text-inter-20 !text-[#545454]">bookmarks</h2>
+                <h2 className="text-inter-20 !text-secondary">bookmarks</h2>
                 {savedProjects.length > 0 && (
                   <span className="badge-unclaimed !bg-[#101010] !text-white tabular-nums">
                     {savedProjects.length}
