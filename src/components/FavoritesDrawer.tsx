@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '../types';
 import { useFavorites } from '../context/FavoritesContext';
-import { X, Bookmark } from 'lucide-react';
+import { X, Bookmark } from './icons';
 
 interface FavoritesDrawerProps {
   isOpen: boolean;

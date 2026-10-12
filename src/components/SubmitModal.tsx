@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, ChevronDown } from './icons';
 import type { Project, CategoryType } from '../types';
 import { getBuilderGradient } from '../types';
 
@@ -489,9 +489,7 @@ export const SubmitModal: React.FC<SubmitModalProps> = ({
                           className="w-full h-[38px] px-4 bg-[#E9E9E9] text-[#101010] text-[12px] text-left border-none outline-none font-sans rounded-full flex items-center justify-between cursor-pointer"
                         >
                           <span>{category}</span>
-                          <svg className="w-4 h-4 text-[#545454]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                          </svg>
+                          <ChevronDown className="w-4 h-4 text-[#545454]" />
                         </button>
                         
                         {isCategoryOpen && (

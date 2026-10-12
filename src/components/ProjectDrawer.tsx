@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '../types';
 import { getBuilderGradient } from '../types';
 import { ToolLogo } from './ToolLogos';
+import { MockupCanvas } from './mockup/MockupCanvas';
 import { 
   X, 
   ArrowUpRight, 
@@ -14,8 +15,8 @@ import {
   Maximize2,
   ChevronLeft,
   ChevronRight,
-  Sparkles
-} from 'lucide-react';
+  Edit
+} from './icons';
 import { useFavorites } from '../context/FavoritesContext';
 
 const getModelColor = (modelName: string) => {
@@ -98,7 +99,11 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   if (!project) return null;
 
   const youtubeEmbedUrl = getYouTubeEmbedUrl(project.youtubeUrl || project.demoUrl);
-  const totalDemoSlides = 3;
+  // Shots after the cover fill the demo carousel; with no shots and no video the section is hidden
+  const extraShots = project.media?.slice(1) ?? [];
+  const totalDemoSlides = Math.max(1, extraShots.length);
+  const currentSlide = demoMediaIndex % totalDemoSlides;
+  const hasDemoShowcase = !!youtubeEmbedUrl || extraShots.length > 0;
 
   const nextDemoMedia = () => {
     setDemoMediaIndex((prev) => (prev + 1) % totalDemoSlides);
@@ -250,9 +255,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                         className="p-1 text-[#545454] hover:text-[#0011FF] transition-colors cursor-pointer"
                         title="Edit project details"
                       >
-                        <svg className="w-4 h-4 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                        </svg>
+                        <Edit className="w-4 h-4" />
                       </button>
                     )}
                   </div>
@@ -319,8 +322,12 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
 
               </div>
 
-              {/* Main Screenshot: Blank Grey Square Block (Fully Squared: aspect-square rounded-none) */}
-              <div className="w-full aspect-square bg-[#D9D9D9] rounded-none shadow-xs" />
+              {/* Main Screenshot: the cover mockup (nothing shown when there's no media) */}
+              {project.media?.[0] && (
+                <div className="w-full shadow-xs">
+                  <MockupCanvas shot={project.media[0]} />
+                </div>
+              )}
 
               {/* Section 1: stack */}
               <div className="space-y-1.5">
@@ -371,7 +378,8 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 </div>
               </div>
 
-              {/* Section 3: demo showcase / video (Fully Squared aspect-square rounded-none + Carousel 3 Dots & Arrows) */}
+              {/* Section 3: demo showcase / video (only when there's a video or extra shots to show) */}
+              {hasDemoShowcase && (
               <div className="space-y-1.5 pb-4">
                 <span className="block text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal mb-1.5">
                   demo showcase
@@ -389,20 +397,16 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   </div>
                 ) : (
                   <div className="relative w-full aspect-square bg-[#D9D9D9] rounded-none overflow-hidden group shadow-xs">
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-4 text-center">
-                      <div className="w-10 h-10 rounded-full bg-[#C2C2C2]/50 flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-[#545454]" />
-                      </div>
-                      <span className="text-mono-10 text-[#545454]">
-                        demo slide {demoMediaIndex + 1} of {totalDemoSlides}
-                      </span>
-                    </div>
+                    <MockupCanvas shot={extraShots[currentSlide]} fill />
 
+                    {totalDemoSlides > 1 && (
+                    <>
                     {/* Carousel Left/Right Navigation */}
                     <button
                       onClick={prevDemoMedia}
                       className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/80 text-[#101010] flex items-center justify-center shadow-md hover:bg-white transition-colors cursor-pointer rounded-none"
                       title="Previous slide"
+                      aria-label="Previous slide"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -411,6 +415,7 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                       onClick={nextDemoMedia}
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/80 text-[#101010] flex items-center justify-center shadow-md hover:bg-white transition-colors cursor-pointer rounded-none"
                       title="Next slide"
+                      aria-label="Next slide"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -422,14 +427,17 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                           key={idx}
                           onClick={() => setDemoMediaIndex(idx)}
                           className={`w-1.5 h-1.5 transition-colors cursor-pointer ${
-                            idx === demoMediaIndex ? 'bg-white' : 'bg-white/40'
+                            idx === currentSlide ? 'bg-white' : 'bg-white/40'
                           }`}
                         />
                       ))}
                     </div>
+                    </>
+                    )}
                   </div>
                 )}
               </div>
+              )}
 
             </div>
 

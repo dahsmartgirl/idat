@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from './icons';
 
 interface ToolFilterBarProps {
   onOpenFilterDrawer: () => void;

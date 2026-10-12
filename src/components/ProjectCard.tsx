@@ -1,10 +1,12 @@
 import React from 'react';
 import type { Project } from '../types';
 import { getBuilderGradient } from '../types';
-import { Bookmark, ArrowUpRight } from 'lucide-react';
+import { Bookmark, ArrowUpRight } from './icons';
 import { useFavorites } from '../context/FavoritesContext';
 import { ToolLogo } from './ToolLogos';
 import { motion } from 'framer-motion';
+import { MockupCanvas } from './mockup/MockupCanvas';
+import { getCanvasAspect } from './mockup/layout';
 
 const getModelColor = (modelName: string) => {
   const lowercaseName = modelName.toLowerCase();
@@ -19,19 +21,20 @@ const getModelColor = (modelName: string) => {
 
 interface ProjectCardProps {
   project: Project;
-  heightClass?: string;
+  // Width / height of the cover when there's no mockup to size it
+  coverAspect?: number;
   onSelectProject: (project: Project) => void;
   onOpenClaim: (project: Project) => void;
   onSelectBuilder?: (handle: string) => void;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({
+export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
   project,
-  heightClass = 'h-[304px]',
+  coverAspect = 450 / 304,
   onSelectProject,
   onOpenClaim,
   onSelectBuilder,
-}) => {
+}) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const [localFavorite, setLocalFavorite] = React.useState(false);
   const favorited = project.id === 'temp-preview-id' ? localFavorite : isFavorite(project.id);
@@ -39,6 +42,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const firstTool = project.aiTools && project.aiTools.length > 0 ? project.aiTools[0] : null;
   const modelsArray = project.aiModel ? project.aiModel.split(',').map(m => m.trim()).filter(Boolean) : [];
   const firstModel = modelsArray.length > 0 ? modelsArray[0] : null;
+  // A mockup keeps the canvas shape it was designed at, so it looks the same at any card width or zoom level
+  const coverShot = project.media?.[0];
+  const aspect = coverShot ? getCanvasAspect(coverShot.settings, coverShot.width / coverShot.height || 1) : coverAspect;
+
   const remainingCount = Math.max(0, (project.aiTools ? project.aiTools.length : 0) - 1) + Math.max(0, modelsArray.length - 1);
 
   return (
@@ -47,7 +54,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       onClick={() => onSelectProject(project)}
     >
       {/* Grey Block (#D9D9D9) */}
-      <div className={`w-full ${heightClass} bg-[#D9D9D9] relative p-3 flex flex-col justify-end transition-opacity group-hover:opacity-95`}>
+      <div
+        className="w-full bg-[#D9D9D9] relative overflow-hidden p-3 flex flex-col justify-end transition-opacity group-hover:opacity-95"
+        style={{ aspectRatio: String(aspect) }}
+      >
+
+        {/* Cover: the first shot's mockup, or a plain cover image */}
+        {coverShot ? (
+          <div className="absolute inset-0">
+            <MockupCanvas shot={coverShot} fill playback="hover" />
+          </div>
+        ) : project.coverImage ? (
+          <img src={project.coverImage} alt={project.name} className="absolute inset-0 w-full h-full object-cover" />
+        ) : null}
         
         {/* Bookmark Icon Top-Right (Icon Only) */}
         <button
@@ -59,8 +78,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               toggleFavorite(project.id);
             }
           }}
-          className="absolute top-2.5 right-2.5 p-1 text-[#545454] hover:opacity-80 transition-transform active:scale-90"
+          className={`absolute z-10 top-2.5 right-2.5 p-1 text-[#545454] ${project.media?.length || project.coverImage ? 'bg-[#F2F1F3]/85 rounded-full' : ''} hover:opacity-80 transition-transform active:scale-90`}
           title={favorited ? 'Remove Bookmark' : 'Bookmark Thing'}
+          aria-label={favorited ? 'Remove bookmark' : 'Bookmark this thing'}
         >
           <Bookmark 
             className={`w-4 h-4 ${favorited ? 'fill-[#545454]' : ''}`} 
@@ -244,4 +264,4 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
     </div>
   );
-};
+});

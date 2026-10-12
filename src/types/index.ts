@@ -1,3 +1,5 @@
+import type { MediaShot } from '../components/mockup/types';
+
 export type CategoryType = 
   | 'All'
   | 'SaaS' 
@@ -53,6 +55,8 @@ export interface Project {
   youtubeUrl?: string;
   xPostUrl?: string;
   coverImage?: string;
+  // Uploaded shots with their mockup settings; the first one is the cover
+  media?: MediaShot[];
   screenshots?: string[];
   techStack?: string[];
   timeline: TimelineMilestone[];

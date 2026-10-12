@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Bookmark, Plus, X } from 'lucide-react';
+import { Search, Bookmark, Plus, X } from './icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFavorites } from '../context/FavoritesContext';
 import { getBuilderGradient } from '../types';

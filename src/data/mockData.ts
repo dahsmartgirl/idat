@@ -1,4 +1,5 @@
 import type { Project, Builder } from '../types';
+import { getMockMedia } from './mockMedia';
 
 export const MOCK_BUILDERS: Record<string, Builder> = {
   'ileri': {
@@ -65,7 +66,7 @@ export const MOCK_BUILDERS: Record<string, Builder> = {
   }
 };
 
-export const MOCK_PROJECTS: Project[] = [
+const BASE_PROJECTS: Project[] = [
   {
     id: 'proj-1',
     slug: 'mcp-fs-inspector',
@@ -219,7 +220,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: 'proj-6',
-    slug: 'synthwave-retro-runner-2',
+    slug: 'whisper-code-assistant',
     name: 'Whisper Code Assistant',
     tagline: 'Voice-to-code VS Code extension for hands-free refactoring.',
     description: 'Speak your refactoring instructions aloud and watch your editor execute precise multi-file diffs using localized Whisper model transcription.',
@@ -318,5 +319,547 @@ export const MOCK_PROJECTS: Project[] = [
       lessonsLearned: 'Terminals are surprisingly fast when using direct stdout write statements.'
     },
     timeline: []
+  },
+  {
+    id: 'proj-10',
+    slug: 'pocket-ledger',
+    name: 'Pocket Ledger',
+    tagline: 'A calm budgeting app that categorises spending from a photo of your receipt.',
+    description: 'Snap a receipt and Pocket Ledger extracts the merchant, items and totals, files them into budgets and nudges you before you overspend.',
+    isClaimed: true,
+    claimedBy: ['josh'],
+    primaryTool: 'lovable',
+    aiTools: ['lovable', 'cursor'],
+    aiModel: 'GPT-4o',
+    category: 'Mobile Apps',
+    tags: ['Finance', 'OCR', 'Budgeting'],
+    techStack: ['React Native', 'Expo', 'Supabase'],
+    demoUrl: 'https://pocketledger.app',
+    createdAt: '2026-08-02',
+    updatedAt: '2026-09-14',
+    buildNotes: {
+      whyBuilt: 'Every budgeting app I tried wanted me to type in transactions by hand. I wanted one that just looked at the receipt.',
+      aiRoleAndPrompts: 'Lovable scaffolded the screens; GPT-4o vision does receipt parsing with a strict JSON schema prompt.',
+      challengesAndFailures: 'Crumpled thermal receipts broke parsing until I added a re-ask step that asks the model to flag low-confidence fields.',
+      lessonsLearned: 'Asking the model for confidence per field is more useful than asking it to be more accurate.'
+    },
+    timeline: [
+      { date: 'August 2, 2026', title: 'Receipt parser prototype', type: 'started' },
+      { date: 'September 14, 2026', title: 'TestFlight beta', type: 'launch' }
+    ]
+  },
+  {
+    id: 'proj-11',
+    slug: 'moodboard-muse',
+    name: 'Moodboard Muse',
+    tagline: 'Turn a vague brief into a curated moodboard, palette and type pairing in seconds.',
+    description: 'Paste a client brief and Muse assembles reference imagery, a colour palette and font pairings you can drag into Figma.',
+    isClaimed: true,
+    claimedBy: ['sarah'],
+    primaryTool: 'v0',
+    aiTools: ['v0', 'midjourney'],
+    aiModel: 'Claude 3.5 Sonnet',
+    category: 'SaaS',
+    tags: ['Design', 'Branding', 'Figma'],
+    techStack: ['Next.js', 'TailwindCSS', 'Vercel'],
+    demoUrl: 'https://moodboardmuse.design',
+    createdAt: '2026-08-11',
+    updatedAt: '2026-09-02',
+    buildNotes: {
+      whyBuilt: 'Kick-off calls always stalled on "what vibe do you want?". I wanted something to react to on the first call.',
+      aiRoleAndPrompts: 'v0 built the board layout; Claude turns briefs into search terms and palette constraints.',
+      challengesAndFailures: 'Early palettes were muddy. Constraining the model to WCAG contrast pairs fixed most of it.',
+      lessonsLearned: 'Hard constraints beat taste adjectives in design prompts.'
+    },
+    timeline: [{ date: 'August 11, 2026', title: 'First board generated', type: 'started' }]
+  },
+  {
+    id: 'proj-12',
+    slug: 'standup-bot',
+    name: 'Standup Bot',
+    tagline: 'Async standups that read your commits and tickets so you only confirm, not write.',
+    description: 'Standup Bot drafts each teammate\'s update from yesterday\'s commits, PRs and ticket moves, then posts a digest to Slack.',
+    isClaimed: true,
+    claimedBy: ['alex'],
+    primaryTool: 'claude-code',
+    aiTools: ['claude-code'],
+    aiModel: 'Claude 3.7 Sonnet',
+    category: 'SaaS',
+    tags: ['Slack', 'Productivity', 'Teams'],
+    techStack: ['Node.js', 'Slack Bolt', 'Postgres'],
+    githubUrl: 'https://github.com/alexrivers/standup-bot',
+    createdAt: '2026-08-20',
+    updatedAt: '2026-09-30',
+    buildNotes: {
+      whyBuilt: 'Our standups were people reading their Jira board aloud. The bot can do that part.',
+      aiRoleAndPrompts: 'Claude Code wrote the Slack and GitHub integrations; summaries use a short few-shot prompt per team.',
+      challengesAndFailures: 'Summaries over-claimed progress on WIP branches, so drafts now separate "shipped" from "in progress".',
+      lessonsLearned: 'People trust drafts they can edit far more than finished summaries.'
+    },
+    timeline: [
+      { date: 'August 20, 2026', title: 'Slack prototype', type: 'started' },
+      { date: 'September 30, 2026', title: 'Used by 12 teams', type: 'milestone' }
+    ]
+  },
+  {
+    id: 'proj-13',
+    slug: 'kanbanana',
+    name: 'Kanbanana',
+    tagline: 'A kanban board that splits fuzzy tasks into shippable cards for you.',
+    description: 'Drop in a big scary task and Kanbanana breaks it into estimated cards, spots blockers and keeps WIP limits honest.',
+    isClaimed: true,
+    claimedBy: ['josh', 'sarah'],
+    primaryTool: 'bolt',
+    aiTools: ['bolt', 'cursor'],
+    aiModel: 'GPT-4o',
+    category: 'SaaS',
+    tags: ['Project Management', 'Kanban'],
+    techStack: ['React', 'Vite', 'Firebase'],
+    demoUrl: 'https://kanbanana.app',
+    createdAt: '2026-07-29',
+    updatedAt: '2026-08-30',
+    buildNotes: {
+      whyBuilt: 'Tickets titled "redo onboarding" sat in To Do forever. Breaking them down was the real work.',
+      aiRoleAndPrompts: 'Bolt generated the board and drag-and-drop; GPT-4o splits tasks using our past cards as examples.',
+      challengesAndFailures: 'Drag-and-drop reordering fought with realtime sync until I moved ordering to fractional indexes.',
+      lessonsLearned: 'Feeding the model your own historical cards makes estimates feel like your team wrote them.'
+    },
+    timeline: [{ date: 'July 29, 2026', title: 'Weekend build', type: 'mvp' }]
+  },
+  {
+    id: 'proj-14',
+    slug: 'prompt-diff',
+    name: 'Prompt Diff',
+    tagline: 'Side-by-side diffs of model outputs when you change a prompt.',
+    description: 'A VS Code extension that reruns your saved test inputs whenever a prompt file changes and shows what the outputs did.',
+    isClaimed: true,
+    claimedBy: ['ileri'],
+    primaryTool: 'cursor',
+    aiTools: ['cursor', 'claude-code'],
+    aiModel: 'Claude 3.7 Sonnet',
+    category: 'VS Code Extensions',
+    tags: ['Prompt Engineering', 'Testing', 'DX'],
+    techStack: ['TypeScript', 'VS Code API'],
+    githubUrl: 'https://github.com/ilerioluwa/prompt-diff',
+    createdAt: '2026-09-03',
+    updatedAt: '2026-09-21',
+    buildNotes: {
+      whyBuilt: 'I kept breaking prompts that used to work. I wanted git diff, but for behaviour.',
+      aiRoleAndPrompts: 'Cursor wrote most of the webview UI; Claude Code handled the test-runner plumbing.',
+      challengesAndFailures: 'Non-determinism made every diff noisy until outputs were compared semantically, not by text.',
+      lessonsLearned: 'Treat prompts like code: version them, test them, diff them.'
+    },
+    timeline: [{ date: 'September 3, 2026', title: 'Marketplace release', type: 'launch' }]
+  },
+  {
+    id: 'proj-15',
+    slug: 'linear-mcp-bridge',
+    name: 'Linear MCP Bridge',
+    tagline: 'Let your coding agent read, create and close Linear issues over MCP.',
+    description: 'An MCP server exposing Linear projects, issues and cycles as tools, with scoped API keys and an audit log.',
+    isClaimed: true,
+    claimedBy: ['maya'],
+    primaryTool: 'claude-code',
+    aiTools: ['claude-code', 'gemini-cli'],
+    aiModel: 'Claude 3.7 Sonnet',
+    category: 'MCP Servers',
+    tags: ['MCP Protocol', 'Linear', 'Agents'],
+    techStack: ['TypeScript', 'MCP SDK', 'GraphQL'],
+    githubUrl: 'https://github.com/mayalin/linear-mcp-bridge',
+    createdAt: '2026-08-14',
+    updatedAt: '2026-10-01',
+    buildNotes: {
+      whyBuilt: 'I wanted my agent to close the ticket it just fixed without me switching tabs.',
+      aiRoleAndPrompts: 'Claude Code generated tool schemas straight from the Linear GraphQL schema.',
+      challengesAndFailures: 'Too many tools confused the agent; grouping them into 6 high-level tools fixed tool selection.',
+      lessonsLearned: 'Fewer, well-described tools beat a 1:1 mirror of the API.'
+    },
+    timeline: [
+      { date: 'August 14, 2026', title: 'First tool call', type: 'started' },
+      { date: 'October 1, 2026', title: 'Open sourced', type: 'open_source' }
+    ]
+  },
+  {
+    id: 'proj-16',
+    slug: 'recipe-remix',
+    name: 'Recipe Remix',
+    tagline: 'Tell it what\'s in your fridge and get three recipes you can actually make tonight.',
+    description: 'Recipe Remix plans meals around what you already have, swaps missing ingredients and scales portions.',
+    isClaimed: false,
+    claimedBy: [],
+    primaryTool: 'replit-agent',
+    aiTools: ['replit-agent'],
+    aiModel: 'Gemini 2.0 Flash',
+    category: 'Mobile Apps',
+    tags: ['Food', 'Cooking', 'Meal Planning'],
+    techStack: ['Flutter', 'Firebase'],
+    createdAt: '2026-08-25',
+    updatedAt: '2026-08-25',
+    buildNotes: {
+      whyBuilt: 'Built to waste less food at home.',
+      aiRoleAndPrompts: 'Replit Agent built the app end to end from a one-page spec.',
+      challengesAndFailures: 'Substitutions were sometimes unsafe (allergies), so they now come with warnings.',
+      lessonsLearned: 'Domain safety rules belong in the system prompt, not the UI.'
+    },
+    timeline: []
+  },
+  {
+    id: 'proj-17',
+    slug: 'pulse-analytics',
+    name: 'Pulse Analytics',
+    tagline: 'Product analytics you can ask questions in plain English.',
+    description: 'Connect your events table and ask "why did signups dip on Tuesday?" — Pulse writes the SQL, charts it and explains it.',
+    isClaimed: true,
+    claimedBy: ['alex'],
+    primaryTool: 'v0',
+    aiTools: ['v0', 'cursor'],
+    aiModel: 'Claude 3.5 Sonnet',
+    category: 'SaaS',
+    tags: ['Analytics', 'SQL', 'Dashboards'],
+    techStack: ['Next.js', 'DuckDB', 'Recharts'],
+    demoUrl: 'https://pulse-analytics.io',
+    createdAt: '2026-07-30',
+    updatedAt: '2026-10-05',
+    buildNotes: {
+      whyBuilt: 'Founders shouldn\'t need to learn SQL to understand their own product.',
+      aiRoleAndPrompts: 'v0 generated the dashboard components; Claude writes and explains SQL against the user\'s schema.',
+      challengesAndFailures: 'Hallucinated column names were the #1 bug until the schema was injected into every prompt.',
+      lessonsLearned: 'Grounding beats cleverness: give the model the schema, every time.'
+    },
+    timeline: [
+      { date: 'July 30, 2026', title: 'Private alpha', type: 'mvp' },
+      { date: 'October 5, 2026', title: 'Public launch', type: 'launch' }
+    ]
+  },
+  {
+    id: 'proj-18',
+    slug: 'tab-zen',
+    name: 'Tab Zen',
+    tagline: 'Pick the colour and type styles off any website with one click.',
+    description: 'A Chrome extension that inspects any page and copies colours, font stacks and spacing as Tailwind tokens.',
+    isClaimed: true,
+    claimedBy: ['maya'],
+    primaryTool: 'windsurf',
+    aiTools: ['windsurf'],
+    aiModel: 'GPT-4o',
+    category: 'Chrome Extensions',
+    tags: ['Design Tools', 'Tailwind', 'Inspector'],
+    techStack: ['TypeScript', 'Chrome APIs', 'Preact'],
+    createdAt: '2026-09-08',
+    updatedAt: '2026-09-18',
+    buildNotes: {
+      whyBuilt: 'I was tired of opening devtools just to grab a hex code.',
+      aiRoleAndPrompts: 'Windsurf did nearly all of the Manifest V3 plumbing.',
+      challengesAndFailures: 'Shadow DOM sites hid their styles from the picker; walking shadow roots fixed it.',
+      lessonsLearned: 'Browser extension APIs are where AI help saves the most time.'
+    },
+    timeline: [{ date: 'September 8, 2026', title: 'Chrome Web Store', type: 'launch' }]
+  },
+  {
+    id: 'proj-19',
+    slug: 'docs-whisperer',
+    name: 'Docs Whisperer',
+    tagline: 'Chat with any API\'s docs and get working request snippets back.',
+    description: 'Point it at an OpenAPI spec or docs site and ask how to do something; it answers with runnable curl, TypeScript or Python.',
+    isClaimed: true,
+    claimedBy: ['ileri'],
+    primaryTool: 'claude-code',
+    aiTools: ['claude-code', 'cursor'],
+    aiModel: 'Claude 3.7 Sonnet',
+    category: 'APIs',
+    tags: ['Documentation', 'RAG', 'Developer Tools'],
+    techStack: ['Python', 'FastAPI', 'pgvector'],
+    demoUrl: 'https://docswhisperer.dev',
+    createdAt: '2026-08-05',
+    updatedAt: '2026-09-27',
+    buildNotes: {
+      whyBuilt: 'Payment provider docs are huge. I just wanted the one request I needed.',
+      aiRoleAndPrompts: 'Claude Code built the ingestion pipeline; answers cite the exact docs section they came from.',
+      challengesAndFailures: 'Chunking by heading lost request examples, so examples are now indexed with their section.',
+      lessonsLearned: 'Citations make developers trust generated code enough to run it.'
+    },
+    timeline: [{ date: 'August 5, 2026', title: 'First spec indexed', type: 'started' }]
+  },
+  {
+    id: 'proj-20',
+    slug: 'pixel-garden',
+    name: 'Pixel Garden',
+    tagline: 'A cosy adventure game for kids, with art directed by Midjourney.',
+    description: 'Explore a hand-painted world, solve gentle puzzles and grow a garden that remembers your choices.',
+    isClaimed: false,
+    claimedBy: [],
+    primaryTool: 'midjourney',
+    aiTools: ['midjourney', 'bolt'],
+    aiModel: 'GPT-4o',
+    category: 'Games',
+    tags: ['Kids', 'Adventure', 'Casual'],
+    techStack: ['Phaser', 'TypeScript'],
+    createdAt: '2026-09-12',
+    updatedAt: '2026-09-12',
+    buildNotes: {
+      whyBuilt: 'Made for my niece, who wanted a game with "no fighting".',
+      aiRoleAndPrompts: 'Midjourney for concept art and tiles; Bolt for the game loop.',
+      challengesAndFailures: 'Keeping a consistent art style needed a fixed style reference image on every prompt.',
+      lessonsLearned: 'Style references matter more than prompt wording for consistency.'
+    },
+    timeline: []
+  },
+  {
+    id: 'proj-21',
+    slug: 'shiplog-cli',
+    name: 'Shiplog CLI',
+    tagline: 'Generate human release notes from your git history in one command.',
+    description: 'Shiplog groups commits by feature, drops the noise and writes release notes your users will actually read.',
+    isClaimed: true,
+    claimedBy: ['alex'],
+    primaryTool: 'claude-code',
+    aiTools: ['claude-code'],
+    aiModel: 'Claude 3.7 Sonnet',
+    category: 'CLI Tools',
+    tags: ['Git', 'Release Notes', 'CI/CD'],
+    techStack: ['Go', 'Cobra'],
+    githubUrl: 'https://github.com/alexrivers/shiplog',
+    createdAt: '2026-08-18',
+    updatedAt: '2026-10-08',
+    buildNotes: {
+      whyBuilt: 'Our changelog was "fix stuff" x40. Release day deserved better.',
+      aiRoleAndPrompts: 'Claude Code wrote the Go CLI from a README-first spec.',
+      challengesAndFailures: 'Huge monorepo histories blew the context window, so commits are now clustered before summarising.',
+      lessonsLearned: 'Write the README first and let the agent build to it.'
+    },
+    timeline: [
+      { date: 'August 18, 2026', title: 'v0.1', type: 'mvp' },
+      { date: 'October 8, 2026', title: 'GitHub Action release', type: 'milestone' }
+    ]
+  },
+  {
+    id: 'proj-22',
+    slug: 'inbox-zero-ai',
+    name: 'Inbox Zero AI',
+    tagline: 'Automations that triage, label and draft replies to your email.',
+    description: 'Build email workflows in a visual editor: classify, label, archive or draft replies with your own tone.',
+    isClaimed: true,
+    claimedBy: ['sarah'],
+    primaryTool: 'cursor',
+    aiTools: ['cursor', 'v0'],
+    aiModel: 'GPT-4o',
+    category: 'SaaS',
+    tags: ['Email', 'Automation', 'Workflows'],
+    techStack: ['Next.js', 'Gmail API', 'Inngest'],
+    demoUrl: 'https://inboxzero.ai',
+    createdAt: '2026-08-08',
+    updatedAt: '2026-09-19',
+    buildNotes: {
+      whyBuilt: 'I spent my first hour every day sorting email.',
+      aiRoleAndPrompts: 'Cursor built the workflow engine; v0 the node editor UI.',
+      challengesAndFailures: 'Drafts sounded robotic until each user\'s sent mail was used as style examples.',
+      lessonsLearned: 'Personal tone comes from examples, not instructions.'
+    },
+    timeline: [{ date: 'August 8, 2026', title: 'Beta waitlist', type: 'started' }]
+  },
+  {
+    id: 'proj-23',
+    slug: 'fable-story-studio',
+    name: 'Fable Story Studio',
+    tagline: 'Co-write branching interactive fiction with an AI narrator.',
+    description: 'Write a scene, and Fable proposes branches, keeps characters consistent and exports a playable story.',
+    isClaimed: true,
+    claimedBy: ['ileri'],
+    primaryTool: 'fable-5',
+    aiTools: ['fable-5', 'claude-code'],
+    aiModel: 'Claude 3.7 Sonnet',
+    category: 'Experiments',
+    tags: ['Writing', 'Interactive Fiction', 'Creative'],
+    techStack: ['React', 'Ink', 'TailwindCSS'],
+    createdAt: '2026-09-15',
+    updatedAt: '2026-10-10',
+    buildNotes: {
+      whyBuilt: 'An experiment in whether AI can be a good writing partner rather than a ghostwriter.',
+      aiRoleAndPrompts: 'Fable 5 drafts branches; a character bible is pinned in context for consistency.',
+      challengesAndFailures: 'Long stories drifted off-character; summarising each chapter into the bible fixed drift.',
+      lessonsLearned: 'Memory is a writing problem as much as an engineering one.'
+    },
+    timeline: [{ date: 'September 15, 2026', title: 'First playable story', type: 'started' }]
+  },
+  {
+    id: 'proj-24',
+    slug: 'habit-loop',
+    name: 'Habit Loop',
+    tagline: 'A habit tracker that adapts your goals when life gets busy.',
+    description: 'Habit Loop notices when you\'re slipping and suggests smaller versions of your habits instead of breaking your streak.',
+    isClaimed: true,
+    claimedBy: ['maya'],
+    primaryTool: 'lovable',
+    aiTools: ['lovable'],
+    aiModel: 'Gemini 2.0 Flash',
+    category: 'Mobile Apps',
+    tags: ['Health', 'Habits', 'Wellness'],
+    techStack: ['React Native', 'Supabase'],
+    createdAt: '2026-08-28',
+    updatedAt: '2026-09-25',
+    buildNotes: {
+      whyBuilt: 'Streak apps made me feel guilty, then I quit them.',
+      aiRoleAndPrompts: 'Lovable built the app; Gemini proposes "minimum viable habits".',
+      challengesAndFailures: 'Notifications felt naggy until they were tied to the user\'s own calendar gaps.',
+      lessonsLearned: 'Kindness is a feature.'
+    },
+    timeline: []
+  },
+  {
+    id: 'proj-25',
+    slug: 'query-copilot',
+    name: 'Query Copilot',
+    tagline: 'Visualise your MongoDB collections and query them in plain English.',
+    description: 'Query Copilot maps your collections, infers relationships and turns questions into aggregation pipelines.',
+    isClaimed: true,
+    claimedBy: ['josh'],
+    primaryTool: 'cursor',
+    aiTools: ['cursor'],
+    aiModel: 'DeepSeek R1',
+    category: 'APIs',
+    tags: ['Databases', 'MongoDB', 'Visualisation'],
+    techStack: ['Electron', 'React', 'MongoDB'],
+    githubUrl: 'https://github.com/joshm/query-copilot',
+    createdAt: '2026-09-01',
+    updatedAt: '2026-09-29',
+    buildNotes: {
+      whyBuilt: 'Aggregation pipelines are powerful and I can never remember the syntax.',
+      aiRoleAndPrompts: 'Built in Cursor; DeepSeek R1 reasons about pipelines step by step.',
+      challengesAndFailures: 'Sampling documents to infer schema missed rare fields; schema now merges across samples.',
+      lessonsLearned: 'Reasoning models shine on multi-stage queries.'
+    },
+    timeline: [{ date: 'September 1, 2026', title: 'First public build', type: 'launch' }]
+  },
+  {
+    id: 'proj-26',
+    slug: 'figma-to-tailwind-mcp',
+    name: 'Figma to Tailwind MCP',
+    tagline: 'An MCP server that hands your agent Figma frames as Tailwind-ready specs.',
+    description: 'Select a frame in Figma and your coding agent receives layout, tokens and assets it can turn straight into components.',
+    isClaimed: true,
+    claimedBy: ['sarah'],
+    primaryTool: 'windsurf',
+    aiTools: ['windsurf', 'cursor'],
+    aiModel: 'Claude 3.5 Sonnet',
+    category: 'MCP Servers',
+    tags: ['Figma', 'MCP Protocol', 'Design to Code'],
+    techStack: ['TypeScript', 'Figma API', 'MCP SDK'],
+    githubUrl: 'https://github.com/sarahchen/figma-tailwind-mcp',
+    createdAt: '2026-09-05',
+    updatedAt: '2026-10-02',
+    buildNotes: {
+      whyBuilt: 'Design handoff was the slowest part of every sprint.',
+      aiRoleAndPrompts: 'Windsurf built the server; prompts map Figma auto-layout to flex and grid.',
+      challengesAndFailures: 'Absolute-positioned frames produced brittle code, so they are flagged for manual review.',
+      lessonsLearned: 'Good design files make good generated code.'
+    },
+    timeline: [{ date: 'October 2, 2026', title: 'Open sourced', type: 'open_source' }]
+  },
+  {
+    id: 'proj-27',
+    slug: 'weather-haiku',
+    name: 'Weather Haiku',
+    tagline: 'Your local forecast, written as a haiku every morning.',
+    description: 'A tiny weather app that turns the forecast into a haiku and a matching gradient. Useful? Somewhat. Joyful? Very.',
+    isClaimed: false,
+    claimedBy: [],
+    primaryTool: 'gemini-cli',
+    aiTools: ['gemini-cli'],
+    aiModel: 'Gemini 2.0 Flash',
+    category: 'Experiments',
+    tags: ['Weather', 'Poetry', 'Fun'],
+    techStack: ['SwiftUI', 'WeatherKit'],
+    createdAt: '2026-09-20',
+    updatedAt: '2026-09-20',
+    buildNotes: {
+      whyBuilt: 'A one-evening experiment to make checking the weather a little nicer.',
+      aiRoleAndPrompts: 'Gemini CLI scaffolded the SwiftUI app; Gemini writes the daily haiku.',
+      challengesAndFailures: 'Syllable counts were often wrong, so a validator retries until it is 5-7-5.',
+      lessonsLearned: 'Simple validators make generative features feel polished.'
+    },
+    timeline: []
+  },
+  {
+    id: 'proj-28',
+    slug: 'focus-timer',
+    name: 'Focus Timer',
+    tagline: 'A Pomodoro timer that blocks distracting tabs and logs what you focused on.',
+    description: 'Start a session, Focus Timer mutes distracting sites, then summarises what you worked on from your open tabs.',
+    isClaimed: true,
+    claimedBy: ['josh'],
+    primaryTool: 'v0',
+    aiTools: ['v0', 'bolt'],
+    aiModel: 'o3-mini',
+    category: 'Chrome Extensions',
+    tags: ['Productivity', 'Focus', 'Pomodoro'],
+    techStack: ['React', 'Chrome APIs'],
+    createdAt: '2026-08-31',
+    updatedAt: '2026-09-11',
+    buildNotes: {
+      whyBuilt: 'I needed a timer that actually stopped me opening Twitter.',
+      aiRoleAndPrompts: 'v0 designed the popup; o3-mini writes the session summaries.',
+      challengesAndFailures: 'Service workers sleeping killed the timer; alarms API fixed it.',
+      lessonsLearned: 'MV3 lifecycle quirks are the real boss fight.'
+    },
+    timeline: [{ date: 'September 11, 2026', title: 'Chrome Web Store', type: 'launch' }]
+  },
+  {
+    id: 'proj-29',
+    slug: 'agent-arena',
+    name: 'Agent Arena',
+    tagline: 'Pit coding agents against the same task and compare their runs side by side.',
+    description: 'Agent Arena runs multiple agents on identical repos and tasks, then scores them on tests passed, cost and time.',
+    isClaimed: true,
+    claimedBy: ['maya', 'alex'],
+    primaryTool: 'claude-code',
+    aiTools: ['claude-code', 'gemini-cli', 'cursor'],
+    aiModel: 'Claude 3.7 Sonnet',
+    category: 'Experiments',
+    tags: ['Agents', 'Benchmarks', 'Evaluation'],
+    techStack: ['Python', 'Docker', 'React'],
+    githubUrl: 'https://github.com/mayalin/agent-arena',
+    createdAt: '2026-09-10',
+    updatedAt: '2026-10-11',
+    buildNotes: {
+      whyBuilt: 'Every "which agent is best" debate lacked receipts.',
+      aiRoleAndPrompts: 'Claude Code built the Docker harness; scoring is deterministic test runs, not model judges.',
+      challengesAndFailures: 'Flaky tests made results noisy, so every task now runs three times.',
+      lessonsLearned: 'Evaluate with tests, not vibes.'
+    },
+    timeline: [
+      { date: 'September 10, 2026', title: 'Harness working', type: 'started' },
+      { date: 'October 11, 2026', title: 'Public leaderboard', type: 'launch' }
+    ]
+  },
+  {
+    id: 'proj-30',
+    slug: 'commit-poet',
+    name: 'Commit Poet',
+    tagline: 'Commit messages that explain why, written from your staged diff.',
+    description: 'A VS Code extension that reads your staged changes and drafts a conventional commit with a meaningful body.',
+    isClaimed: false,
+    claimedBy: [],
+    primaryTool: 'claude-code',
+    aiTools: ['claude-code'],
+    aiModel: 'Claude 3.5 Sonnet',
+    category: 'VS Code Extensions',
+    tags: ['Git', 'Commits', 'DX'],
+    techStack: ['TypeScript', 'VS Code API'],
+    createdAt: '2026-09-22',
+    updatedAt: '2026-09-22',
+    buildNotes: {
+      whyBuilt: 'Future me deserves to know why I changed things.',
+      aiRoleAndPrompts: 'Claude Code wrote the extension in an afternoon.',
+      challengesAndFailures: 'Large diffs produced vague messages; it now summarises per file first.',
+      lessonsLearned: 'Summarise hierarchically for big inputs.'
+    },
+    timeline: []
   }
+
 ];
+
+// Every mock project gets Dribbble media with a seeded random mockup style; the first shot is the cover
+export const MOCK_PROJECTS: Project[] = BASE_PROJECTS.map((project) => {
+  const media = getMockMedia(project.slug);
+  return { ...project, media, coverImage: media[0]?.src || project.coverImage };
+});

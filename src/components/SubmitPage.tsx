@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Upload } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ChevronDown } from './icons';
 import type { Project, CategoryType } from '../types';
 import { getBuilderGradient } from '../types';
 import { ProjectCard } from './ProjectCard';
 import { ToolLogo } from './ToolLogos';
+import { MockupCanvas } from './mockup/MockupCanvas';
+import { MockupEditor, type MockupTab } from './mockup/MockupEditor';
+import { ShotStrip } from './mockup/ShotStrip';
+import { createShotFromFile } from './mockup/layout';
+import type { MediaShot, MockupSettings } from './mockup/types';
 
 interface SubmitPageProps {
   onSubmitSuccess: (newProject: Partial<Project>) => void;
@@ -145,15 +150,15 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   const [modelsTouched, setModelsTouched] = useState(false);
   const [buildNotesTouched, setBuildNotesTouched] = useState(false);
 
-  // Media states
-  const [coverImagePreview, setCoverImagePreview] = useState<string>('');
-  const coverImageInputRef = useRef<HTMLInputElement>(null);
+  // Media: uploaded shots, each with its own mockup settings (first shot is the cover)
+  const [shots, setShots] = useState<MediaShot[]>([]);
+  const [activeShotId, setActiveShotId] = useState<string | null>(null);
+  const [mockupTab, setMockupTab] = useState<MockupTab>('frame');
+  const [isAddingShots, setIsAddingShots] = useState(false);
+  const [previewMode, setPreviewMode] = useState<'mockup' | 'card'>('mockup');
 
-  // Showcase Media
-  const [mediaOption, setMediaOption] = useState<'youtube' | 'upload'>('youtube');
+  // Optional demo video link
   const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [submitted, setSubmitted] = useState(false);
   const [windowWidth, setWindowWidth] = useState(
@@ -191,9 +196,8 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       setSelectedTools(editingProject.aiTools || []);
       setSelectedModels(editingProject.aiModel ? [editingProject.aiModel] : []);
       setBuildNotesText(editingProject.buildNotes?.whyBuilt || '');
-      setMediaOption(editingProject.youtubeUrl ? 'youtube' : 'upload');
-      setUploadedFile(null);
-      setCoverImagePreview('');
+      setShots(editingProject.media || []);
+      setActiveShotId(editingProject.media?.[0]?.id ?? null);
       
       setNameTouched(false);
       setTaglineTouched(false);
@@ -214,9 +218,8 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       setSelectedTools([]);
       setSelectedModels([]);
       setBuildNotesText('');
-      setMediaOption('youtube');
-      setUploadedFile(null);
-      setCoverImagePreview('');
+      setShots([]);
+      setActiveShotId(null);
 
       setNameTouched(false);
       setTaglineTouched(false);
@@ -227,15 +230,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       setBuildNotesTouched(false);
     }
   }, [isEditing, editingProject]);
-
-  // Clean preview URLs
-  useEffect(() => {
-    return () => {
-      if (coverImagePreview && coverImagePreview.startsWith('blob:')) {
-        URL.revokeObjectURL(coverImagePreview);
-      }
-    };
-  }, [coverImagePreview]);
 
   // Derived Suggestion Lists
   const cleanCreatorInput = creatorInput.trim().replace('@', '');
@@ -275,9 +269,10 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       setModelsTouched(false);
       setBuildNotesTouched(false);
     } else {
-      setCoverImagePreview('');
+      shots.forEach(releaseShot);
+      setShots([]);
+      setActiveShotId(null);
       setYoutubeUrl('');
-      setUploadedFile(null);
     }
   };
 
@@ -336,31 +331,56 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
     setModelsTouched(true);
   };
 
-  // Files
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCoverImagePreview(URL.createObjectURL(file));
-    }
+  // Shots
+  const activeShot = shots.find((shot) => shot.id === activeShotId) || shots[0] || null;
+
+  // Free a shot's blob URL, unless the project being edited still uses it
+  const releaseShot = (shot: MediaShot) => {
+    const savedElsewhere = editingProject?.media?.some((m) => m.src === shot.src);
+    if (savedElsewhere) return;
+    [shot.src, shot.poster].forEach((url) => url?.startsWith('blob:') && URL.revokeObjectURL(url));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-    }
+  const handleAddShots = async (files: File[]) => {
+    setIsAddingShots(true);
+    // New shots inherit the current look so a set stays consistent
+    const base = activeShot?.settings;
+    const results = await Promise.allSettled(files.map((file) => createShotFromFile(file, base)));
+    const added = results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
+    setIsAddingShots(false);
+    if (!added.length) return;
+    setShots((prev) => [...prev, ...added]);
+    setActiveShotId(added[0].id);
   };
 
-  const handleRemoveUploadedFile = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setUploadedFile(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+  const handleRemoveShot = (id: string) => {
+    const shot = shots.find((s) => s.id === id);
+    if (shot) releaseShot(shot);
+    const remaining = shots.filter((s) => s.id !== id);
+    setShots(remaining);
+    if (activeShotId === id) setActiveShotId(remaining[0]?.id ?? null);
   };
 
-  const handleRemoveCoverFile = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCoverImagePreview('');
-    if (coverImageInputRef.current) coverImageInputRef.current.value = '';
+  const updateActiveSettings = (patch: Partial<MockupSettings>) => {
+    if (!activeShot) return;
+    setShots((prev) =>
+      prev.map((shot) =>
+        shot.id === activeShot.id ? { ...shot, settings: { ...shot.settings, ...patch } } : shot
+      )
+    );
+  };
+
+  // Copies the look (not frame, canvas size or zoom, which depend on each shot) to every shot
+  const applyStyleToAll = () => {
+    if (!activeShot) return;
+    const { background, padding, radius, shadow, shadowStrength, noise, texture, textureOpacity, frameTheme } =
+      activeShot.settings;
+    setShots((prev) =>
+      prev.map((shot) => ({
+        ...shot,
+        settings: { ...shot.settings, background, padding, radius, shadow, shadowStrength, noise, texture, textureOpacity, frameTheme },
+      }))
+    );
   };
 
   // Helper to validate Step 1 fields
@@ -426,10 +446,12 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
           claimedBy: creators,
           demoUrl: cleanDemoUrl,
           githubUrl: cleanGithubUrl,
-          youtubeUrl: mediaOption === 'youtube' ? cleanYoutubeUrl : '',
+          youtubeUrl: cleanYoutubeUrl,
           aiTools: selectedTools,
           primaryTool: selectedTools[0] || '',
           aiModel: selectedModels.join(', '),
+          media: shots,
+          coverImage: shots[0]?.src || '',
           buildNotes: {
             ...editingProject.buildNotes,
             whyBuilt: buildNotesText,
@@ -446,11 +468,12 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
           claimedBy: creators,
           demoUrl: cleanDemoUrl,
           githubUrl: cleanGithubUrl,
-          youtubeUrl: mediaOption === 'youtube' ? cleanYoutubeUrl : '',
+          youtubeUrl: cleanYoutubeUrl,
           aiTools: selectedTools,
           primaryTool: selectedTools[0] || '',
           aiModel: selectedModels.join(', '),
-          coverImage: '',
+          media: shots,
+          coverImage: shots[0]?.src || '',
           screenshots: [],
           tags: ['AI-built', category.toLowerCase().replace(/\s+/g, '-')],
           techStack: ['React', 'TypeScript'],
@@ -485,7 +508,8 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       primaryTool: selectedTools[0] || '',
       aiTools: selectedTools,
       aiModel: selectedModels.join(', '),
-      coverImage: coverImagePreview || '',
+      coverImage: shots[0]?.src || '',
+      media: shots,
       screenshots: [],
       tags: [],
       techStack: [],
@@ -515,6 +539,51 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       </div>
     );
   };
+
+  // Step 2 preview: the live mockup (editable) or the card it produces
+  const renderMediaPreview = () => (
+    <div className="w-full flex flex-col gap-2.5 select-none">
+      <div className="flex items-center justify-between">
+        <div className="submit-toggle-container">
+          {(['mockup', 'card'] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setPreviewMode(mode)}
+              className={`submit-toggle-tab ${previewMode === mode ? 'active' : 'inactive'}`}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+        {activeShot && previewMode === 'mockup' && (
+          <span className="text-mono-10 truncate max-w-[55%]">
+            {activeShot.width}×{activeShot.height} · {activeShot.kind}
+          </span>
+        )}
+      </div>
+
+      {previewMode === 'card' ? (
+        renderPreviewPanel()
+      ) : activeShot ? (
+        <MockupCanvas
+          shot={activeShot}
+          checker
+          showFocus={mockupTab === 'zoom'}
+          onPickFocus={
+            mockupTab === 'zoom'
+              ? (focusX, focusY) =>
+                  updateActiveSettings({ focusX, focusY, zoom: Math.max(activeShot.settings.zoom, 1.5) })
+              : undefined
+          }
+        />
+      ) : (
+        <div className="w-full aspect-[16/10] bg-[#D9D9D9] flex items-center justify-center">
+          <span className="text-mono-10">your mockup shows up here</span>
+        </div>
+      )}
+    </div>
+  );
 
   const sortedCategories = [category, ...CATEGORIES.filter((cat) => cat !== category)];
 
@@ -621,9 +690,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             className="submit-dropdown-btn"
                           >
                             <span>{category}</span>
-                            <svg className="w-4 h-4 text-[#545454]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <ChevronDown className="w-4 h-4 text-[#545454]" />
                           </button>
                           
                           {isCategoryOpen && (
@@ -1043,136 +1110,71 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       className="space-y-4.5"
                     >
                       
-                      {/* Cover image upload */}
+                      {/* Shots: upload, pick, reorder */}
                       <div>
-                        <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">project actual cover image</label>
-                        <input
-                          type="file"
-                          ref={coverImageInputRef}
-                          onChange={handleCoverChange}
-                          className="hidden"
-                        />
-                        <div 
-                          onClick={() => coverImageInputRef.current?.click()}
-                          className="submit-dropzone select-none overflow-hidden relative"
-                        >
-                          {coverImagePreview ? (
-                            <motion.img 
-                              src={coverImagePreview} 
-                              alt="Cover preview" 
-                              className="absolute inset-0 w-full h-full object-cover rounded-[8px]"
-                              initial={{ opacity: 0, scale: 0.98 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ duration: 0.3 }}
-                            />
-                          ) : (
-                            <>
-                              <Upload className="w-4 h-4 text-[#545454] mb-1" />
-                              <span className="text-inter-14 text-[11px]">Click to select project cover image</span>
-                            </>
-                          )}
-                          {coverImagePreview && (
-                            <button
-                              type="button"
-                              onClick={handleRemoveCoverFile}
-                              className="absolute bottom-2 right-2 bg-black/70 text-white rounded px-2 py-0.5 text-[9px] hover:bg-black/90 cursor-pointer font-sans select-none border-none outline-none"
-                            >
-                              remove
-                            </button>
+                        <div className="flex items-baseline justify-between mb-1">
+                          <label className="block text-inter-14 text-[#101010] font-medium lowercase">showcase shots</label>
+                          {shots.length > 0 && (
+                            <span className="text-mono-10">drag to reorder · first is the cover</span>
                           )}
                         </div>
+                        <ShotStrip
+                          shots={shots}
+                          activeId={activeShot?.id ?? null}
+                          onSelect={setActiveShotId}
+                          onReorder={setShots}
+                          onRemove={handleRemoveShot}
+                          onAddFiles={handleAddShots}
+                          isLoading={isAddingShots}
+                        />
                       </div>
 
-                      {/* Showcase Media Options */}
-                      <div className="space-y-3 pt-1">
-                        <div className="flex justify-between items-center">
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase">showcase media</label>
-                          
-                          <div className="submit-toggle-container">
-                            <button
-                              type="button"
-                              onClick={() => setMediaOption('youtube')}
-                              className={`submit-toggle-tab ${mediaOption === 'youtube' ? 'active' : 'inactive'}`}
-                            >
-                              youtube
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setMediaOption('upload')}
-                              className={`submit-toggle-tab ${mediaOption === 'upload' ? 'active' : 'inactive'}`}
-                            >
-                              upload
-                            </button>
-                          </div>
-                        </div>
+                      {/* Mobile: the mockup sits between the shots and its controls */}
+                      {isMobile && shots.length > 0 && renderMediaPreview()}
 
-                        {mediaOption === 'youtube' ? (
-                          <div>
-                            <input
-                              type="url"
-                              value={youtubeUrl}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (!val.startsWith('https://')) {
-                                  setYoutubeUrl('https://');
-                                } else {
-                                  setYoutubeUrl(val);
-                                }
-                              }}
-                              onFocus={() => {
-                                if (!youtubeUrl) setYoutubeUrl('https://');
-                              }}
-                              onBlur={() => {
-                                if (youtubeUrl === 'https://') setYoutubeUrl('');
-                              }}
-                              placeholder="https://youtube.com/watch?v=..."
-                              className="submit-input-text"
-                            />
-                          </div>
-                        ) : (
-                          <div>
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={handleFileChange}
-                              className="hidden"
-                            />
-                            <div 
-                              onClick={() => fileInputRef.current?.click()}
-                              className="submit-dropzone select-none overflow-hidden relative"
-                            >
-                              {uploadedFile ? (
-                                <div className="text-center">
-                                  <span className="text-inter-14 text-[11px] block truncate px-4">
-                                    {uploadedFile.name}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={handleRemoveUploadedFile}
-                                    className="text-red-500 font-bold mt-1 text-[11px] hover:underline cursor-pointer border-none outline-none bg-transparent"
-                                  >
-                                    remove
-                                  </button>
-                                </div>
-                              ) : (
-                                <>
-                                  <Upload className="w-4 h-4 text-[#545454] mb-1" />
-                                  <span className="text-inter-14 text-[11px]">Click to select project media/screenshot</span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                      {/* Mockup controls for the selected shot */}
+                      {activeShot && (
+                        <div>
+                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1.5">mockup</label>
+                          <MockupEditor
+                            settings={activeShot.settings}
+                            onChange={updateActiveSettings}
+                            tab={mockupTab}
+                            onTabChange={setMockupTab}
+                            shotCount={shots.length}
+                            onApplyToAll={applyStyleToAll}
+                          />
+                        </div>
+                      )}
+
+                      {/* Optional demo video link */}
+                      <div>
+                        <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">
+                          demo video link <span className="text-mono-10">optional</span>
+                        </label>
+                        <input
+                          type="url"
+                          value={youtubeUrl}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (!val.startsWith('https://')) {
+                              setYoutubeUrl('https://');
+                            } else {
+                              setYoutubeUrl(val);
+                            }
+                          }}
+                          onFocus={() => {
+                            if (!youtubeUrl) setYoutubeUrl('https://');
+                          }}
+                          onBlur={() => {
+                            if (youtubeUrl === 'https://') setYoutubeUrl('');
+                          }}
+                          placeholder="https://youtube.com/watch?v=..."
+                          className="submit-input-text"
+                        />
                       </div>
 
                     </motion.div>
-                  )}
-
-                  {/* Mobile Preview under Step 2 */}
-                  {isMobile && step === 2 && (
-                    <div className="py-4">
-                      {renderPreviewPanel()}
-                    </div>
                   )}
 
                   {/* Page Navigation Footer (fixed/sticky actions, content hugging) */}
@@ -1252,7 +1254,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
             {/* RIGHT PANEL: LIVE PROJECT CARD PREVIEW (Desktop Only; Hidden on Mobile except Step 3) */}
             {!isMobile && (
               <div className="sticky top-24 flex items-center justify-center bg-transparent border-none">
-                {renderPreviewPanel()}
+                {step === 2 ? renderMediaPreview() : renderPreviewPanel()}
               </div>
             )}
 

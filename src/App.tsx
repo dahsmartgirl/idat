@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FavoritesProvider } from './context/FavoritesContext';
@@ -110,24 +110,25 @@ function AppLayout() {
     filters.aiModels.length +
     (filters.status !== 'all' ? 1 : 0);
 
-  const handleSelectBuilder = (builderHandle: string) => {
+  // Stable handlers so the memoized grid and cards don't re-render when drawers open or the window resizes
+  const handleSelectBuilder = useCallback((builderHandle: string) => {
     const cleanHandle = builderHandle.replace('@', '');
     setActiveProject(null);
     setIsFilterDrawerOpen(false);
     setIsFavoritesOpen(false);
     navigate(`/${cleanHandle}`);
-  };
+  }, [navigate]);
 
-  const handleOpenClaim = (project: Project) => {
+  const handleOpenClaim = useCallback((project: Project) => {
     setClaimingProject(project);
     setIsSubmitOpen(true);
-  };
+  }, []);
 
-  const handleSelectProject = (project: Project) => {
+  const handleSelectProject = useCallback((project: Project) => {
     setIsFilterDrawerOpen(false);
     setIsFavoritesOpen(false);
     setActiveProject(project);
-  };
+  }, []);
 
   const handleAddProject = (newProjectData: Partial<Project>) => {
     if (claimingProject) {

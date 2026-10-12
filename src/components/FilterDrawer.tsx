@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, RotateCcw } from 'lucide-react';
+import { X, RotateCcw } from './icons';
 import type { CategoryType, FilterState } from '../types';
 import { ToolLogo } from './ToolLogos';
 
