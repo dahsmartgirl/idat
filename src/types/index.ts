@@ -81,6 +81,8 @@ export interface FilterState {
   status: 'all' | 'claimed' | 'unclaimed';
 }
 
+export const EMPTY_FILTERS: FilterState = { aiTools: [], categories: [], aiModels: [], status: 'all' };
+
 export const BUILDER_GRADIENTS: Record<string, string> = {
   'ileri': 'bg-gradient-to-br from-[#101010] via-[#2A2A2A] to-[#545454]', // black/grey
   'maya': 'bg-gradient-to-br from-[#E11D48] via-[#F43F5E] to-[#FB7185]',  // pink

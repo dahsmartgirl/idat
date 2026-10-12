@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCcw } from './icons';
 import type { CategoryType, FilterState } from '../types';
+import { EMPTY_FILTERS } from '../types';
 import { ModelLogo, ToolLogo } from './ToolLogos';
 import { CATEGORIES, MODELS, TOOLS } from '../data/catalog';
 
@@ -10,7 +11,6 @@ interface FilterDrawerProps {
   onClose: () => void;
   filters: FilterState;
   onApplyFilters: (filters: FilterState) => void;
-  totalFilteredCount: number;
   availableTools?: string[];
   availableCategories?: string[];
   availableModels?: string[];
@@ -28,13 +28,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   onClose,
   filters,
   onApplyFilters,
-  totalFilteredCount,
   availableTools,
   availableCategories,
   availableModels,
   showStatus = true,
 }) => {
-  const [draftFilters, setDraftFilters] = React.useState<FilterState>(filters);
 
   // Filter options based on available props if supplied
   const aiToolsList = React.useMemo(() => {
@@ -52,11 +50,6 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
     return ALL_AI_MODELS.filter((m) => availableModels.includes(m.name));
   }, [availableModels]);
 
-  // Synchronize draft state when drawer opens
-  React.useEffect(() => {
-    setDraftFilters(filters);
-  }, [filters, isOpen]);
-
   // Lock body scroll when drawer is open
   React.useEffect(() => {
     if (isOpen) {
@@ -69,8 +62,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
     };
   }, [isOpen]);
 
+  // Every change applies straight away (no apply step)
+  const update = (change: (prev: FilterState) => FilterState) => onApplyFilters(change(filters));
+
   const toggleTool = (toolId: string) => {
-    setDraftFilters((prev) => {
+    update((prev) => {
       const exists = prev.aiTools.includes(toolId);
       return {
         ...prev,
@@ -82,7 +78,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   };
 
   const toggleCategory = (cat: CategoryType) => {
-    setDraftFilters((prev) => {
+    update((prev) => {
       const exists = prev.categories.includes(cat);
       return {
         ...prev,
@@ -94,7 +90,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   };
 
   const toggleModel = (model: string) => {
-    setDraftFilters((prev) => {
+    update((prev) => {
       const exists = prev.aiModels.includes(model);
       return {
         ...prev,
@@ -106,31 +102,17 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   };
 
   const setStatus = (status: 'all' | 'claimed' | 'unclaimed') => {
-    setDraftFilters((prev) => ({ ...prev, status }));
+    update((prev) => ({ ...prev, status }));
   };
 
-  const handleReset = () => {
-    const emptyFilters: FilterState = {
-      aiTools: [],
-      categories: [],
-      aiModels: [],
-      status: 'all',
-    };
-    setDraftFilters(emptyFilters);
-    onApplyFilters(emptyFilters);
-    onClose();
-  };
-
-  const handleApply = () => {
-    onApplyFilters(draftFilters);
-    onClose();
-  };
+  // Clears everything; the drawer stays open so you can pick again
+  const handleReset = () => onApplyFilters(EMPTY_FILTERS);
 
   const activeCount =
-    draftFilters.aiTools.length +
-    draftFilters.categories.length +
-    draftFilters.aiModels.length +
-    (showStatus && draftFilters.status !== 'all' ? 1 : 0);
+    filters.aiTools.length +
+    filters.categories.length +
+    filters.aiModels.length +
+    (showStatus && filters.status !== 'all' ? 1 : 0);
 
   return (
     <AnimatePresence>
@@ -190,7 +172,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                 )}
               </div>
 
-              {/* Right Controls: reset all (btn-secondary) + apply (btn-main) */}
+              {/* Right Controls: reset all (filters apply as you pick them) */}
               <div className="flex items-center gap-1.5 sm:gap-2">
                 
                 {/* reset all button */}
@@ -203,27 +185,6 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                   <span>reset all</span>
                 </button>
 
-                {/* apply filters button */}
-                <button
-                  onClick={handleApply}
-                  className="btn-main relative overflow-hidden flex items-center justify-center gap-1"
-                  title="Apply filters"
-                >
-                  <motion.div
-                    className="absolute -inset-y-4 w-full h-[200%] bg-[linear-gradient(135deg,transparent_0%,rgba(255,255,255,0.45)_50%,transparent_100%)] pointer-events-none blur-[0.5px]"
-                    initial={{ x: '-150%', y: '-40%' }}
-                    animate={{ x: ['-150%', '160%'], y: ['-40%', '40%'] }}
-                    transition={{
-                      repeat: Infinity,
-                      repeatDelay: 4.2,
-                      duration: 1.5,
-                      ease: [0.4, 0, 0.2, 1]
-                    }}
-                  />
-                  <span className="relative z-10 text-white/90">
-                    apply ({totalFilteredCount})
-                  </span>
-                </button>
 
               </div>
             </div>
@@ -242,7 +203,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 
                   <div className="flex flex-wrap gap-1.5">
                     {aiToolsList.map((t) => {
-                      const active = draftFilters.aiTools.includes(t.id);
+                      const active = filters.aiTools.includes(t.id);
                       return (
                         <button
                           key={t.id}
@@ -274,7 +235,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 
                   <div className="flex flex-wrap gap-1.5">
                     {categoriesList.map((cat) => {
-                      const active = draftFilters.categories.includes(cat);
+                      const active = filters.categories.includes(cat);
                       return (
                         <button
                           key={cat}
@@ -305,7 +266,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 
                   <div className="flex flex-wrap gap-1.5">
                     {aiModelsList.map((m) => {
-                      const active = draftFilters.aiModels.includes(m.name);
+                      const active = filters.aiModels.includes(m.name);
                       return (
                         <button
                           key={m.name}
@@ -339,11 +300,12 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                       { id: 'claimed', label: 'Claimed' },
                       { id: 'unclaimed', label: 'Unclaimed' },
                     ].map((st) => {
-                      const active = draftFilters.status === st.id;
+                      const active = filters.status === st.id;
                       return (
                         <button
                           key={st.id}
-                          onClick={() => setStatus(st.id as 'all' | 'claimed' | 'unclaimed')}
+                          // Tapping the active claimed/unclaimed again cancels it, back to all
+                          onClick={() => setStatus(active ? 'all' : (st.id as 'all' | 'claimed' | 'unclaimed'))}
                           className={`tool-pill flex-1 justify-center cursor-pointer transition-colors ${
                             active ? '!bg-[#101010] !text-white' : 'hover:!bg-[#D9D9D9]'
                           }`}
@@ -351,7 +313,8 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                           <span className={`text-mono-10 ${active ? '!text-white' : ''}`}>
                             {st.label}
                           </span>
-                          {active && <X className="w-2.5 h-2.5 ml-1 stroke-[2.5]" />}
+                          {/* "All" can't be cancelled, so it gets no x */}
+                          {active && st.id !== 'all' && <X className="w-2.5 h-2.5 ml-1 stroke-[2.5]" />}
                         </button>
                       );
                     })}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { Project, FilterState } from '../types';
-import { getBuilderGradient } from '../types';
+import { getBuilderGradient, EMPTY_FILTERS } from '../types';
 import { MOCK_BUILDERS, MOCK_PROJECTS } from '../data/mockData';
-import { SlidersHorizontal, Github, XLogo } from './icons';
+import { Github, XLogo } from './icons';
 import { ProjectMasonry } from './ProjectMasonry';
 import { FilterDrawer } from './FilterDrawer';
+import { FilterRow } from './ToolFilterBar';
 import { ToolLogo } from './ToolLogos';
 
 interface BuilderProfilePageProps {
@@ -70,12 +71,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
 }) => {
   const cleanHandle = (username || 'ileri').replace('@', '').toLowerCase();
 
-  const [filters, setFilters] = useState<FilterState>({
-    aiTools: [],
-    categories: [],
-    aiModels: [],
-    status: 'all',
-  });
+  const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const builder = MOCK_BUILDERS[cleanHandle] || {
@@ -324,7 +320,12 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
         <div className="w-full pt-2">
           
           {/* Row: "3 things." (Solid #545454 grey text) + Filter Button */}
-          <div className="px-4 sm:px-8 py-2 flex items-center justify-between">
+          <FilterRow
+            className="px-4 sm:px-8 py-2"
+            onOpen={() => setIsFilterDrawerOpen(true)}
+            activeCount={activeFilterCount}
+            onClear={() => setFilters(EMPTY_FILTERS)}
+          >
             <div className="flex items-baseline gap-1">
               <span className="text-mono-20 text-secondary">
                 <ScrambleNumber value={filteredBuilderProjects.length} color="var(--color-secondary)" />
@@ -333,22 +334,7 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
                 {filteredBuilderProjects.length === 1 ? 'thing.' : 'things.'}
               </span>
             </div>
-
-            {/* Filter Button */}
-            <button
-              onClick={() => setIsFilterDrawerOpen(true)}
-              className="btn-secondary flex items-center gap-1 group"
-              title="Open filters"
-            >
-              <SlidersHorizontal className="w-3 h-3 stroke-[2] text-[#101010]" />
-              <span>filter</span>
-              {activeFilterCount > 0 && (
-                <span className="ml-0.5 px-1.5 py-0.2 rounded-full bg-[#101010] text-white text-[9px] font-mono font-bold">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-          </div>
+          </FilterRow>
 
           {/* Projects Showcase Masonry Grid */}
           <div className="pt-2">
@@ -379,7 +365,6 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
         onClose={() => setIsFilterDrawerOpen(false)}
         filters={filters}
         onApplyFilters={(newFilters) => setFilters(newFilters)}
-        totalFilteredCount={filteredBuilderProjects.length}
         availableTools={availableTools}
         availableCategories={availableCategories}
         availableModels={availableModels}

@@ -14,6 +14,7 @@ import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { FilterDrawer } from './components/FilterDrawer';
 import { MOCK_PROJECTS } from './data/mockData';
 import type { Project, FilterState } from './types';
+import { EMPTY_FILTERS } from './types';
 import { handleFromPath, profilePath, projectPath } from './lib/paths';
 
 // Old profile links (/josh, /b/josh, /builder/josh) forward to /@josh
@@ -51,12 +52,7 @@ function AppLayout() {
   }, []);
 
   // Rich Filter state for home grid
-  const [filters, setFilters] = useState<FilterState>({
-    aiTools: [],
-    categories: [],
-    aiModels: [],
-    status: 'all',
-  });
+  const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   // Modals & Drawers state
@@ -337,6 +333,7 @@ function AppLayout() {
                   <ToolFilterBar
                     onOpenFilterDrawer={() => setIsFilterDrawerOpen(true)}
                     activeFilterCount={activeFilterCount}
+                    onClearFilters={() => setFilters(EMPTY_FILTERS)}
                   />
 
                   {/* MASONRY PROJECT GRID */}
@@ -402,7 +399,6 @@ function AppLayout() {
         onClose={() => setIsFilterDrawerOpen(false)}
         filters={filters}
         onApplyFilters={(updatedFilters) => setFilters(updatedFilters)}
-        totalFilteredCount={filteredProjects.length}
         availableTools={filterOptions.tools}
         availableModels={filterOptions.models}
         availableCategories={filterOptions.categories}
