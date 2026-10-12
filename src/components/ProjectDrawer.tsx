@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '../types';
 import { getBuilderGradient } from '../types';
-import { ToolLogo } from './ToolLogos';
+import { ModelLogo, ToolLogo } from './ToolLogos';
+import { getTool } from '../data/catalog';
 import { MockupCanvas } from './mockup/MockupCanvas';
 import { 
   X, 
@@ -19,16 +20,6 @@ import {
 } from './icons';
 import { useFavorites } from '../context/FavoritesContext';
 
-const getModelColor = (modelName: string) => {
-  const lowercaseName = modelName.toLowerCase();
-  if (lowercaseName.includes('claude 3.7')) return '#D97757';
-  if (lowercaseName.includes('claude 3.5')) return '#D97757';
-  if (lowercaseName.includes('gpt-4o')) return '#10B981';
-  if (lowercaseName.includes('gemini 2.0')) return '#0284C7';
-  if (lowercaseName.includes('deepseek')) return '#3B82F6';
-  if (lowercaseName.includes('o3-mini')) return '#10B981';
-  return '#999999';
-};
 
 interface ProjectDrawerProps {
   project: Project | null;
@@ -339,17 +330,14 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                   {project.aiTools && project.aiTools.map((toolId) => (
                     <div key={toolId} className="tool-pill">
                       <ToolLogo toolId={toolId} size={11} />
-                      <span className="text-mono-10 capitalize">{toolId.replace('-', ' ')}</span>
+                      <span className="text-mono-10">{getTool(toolId)?.name ?? toolId}</span>
                     </div>
                   ))}
                   
                   {/* Next render AI Models */}
                   {project.aiModel && project.aiModel.split(',').map(m => m.trim()).filter(Boolean).map((modelName) => (
                     <div key={modelName} className="tool-pill">
-                      <div
-                        className="w-1.5 h-1.5 shrink-0"
-                        style={{ backgroundColor: getModelColor(modelName) }}
-                      />
+                      <ModelLogo model={modelName} size={11} />
                       <span className="text-mono-10">{modelName}</span>
                     </div>
                   ))}

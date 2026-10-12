@@ -91,7 +91,9 @@ function AppLayout() {
 
       // 4. AI Models Filter
       if (filters.aiModels.length > 0) {
-        if (!project.aiModel || !filters.aiModels.includes(project.aiModel)) {
+        // aiModel can list several models ("A, B"); match if any of them is selected
+        const projectModels = (project.aiModel ?? '').split(',').map((m) => m.trim());
+        if (!projectModels.some((m) => filters.aiModels.includes(m))) {
           return false;
         }
       }
@@ -103,6 +105,13 @@ function AppLayout() {
       return true;
     });
   }, [projects, searchQuery, filters]);
+
+  // Filter options: only tools, models and categories that at least one project uses
+  const filterOptions = useMemo(() => ({
+    tools: [...new Set(projects.flatMap((p) => p.aiTools))],
+    models: [...new Set(projects.flatMap((p) => (p.aiModel ?? '').split(',').map((m) => m.trim()).filter(Boolean)))],
+    categories: [...new Set(projects.map((p) => p.category))],
+  }), [projects]);
 
   const activeFilterCount =
     filters.aiTools.length +
@@ -280,6 +289,9 @@ function AppLayout() {
         filters={filters}
         onApplyFilters={(updatedFilters) => setFilters(updatedFilters)}
         totalFilteredCount={filteredProjects.length}
+        availableTools={filterOptions.tools}
+        availableModels={filterOptions.models}
+        availableCategories={filterOptions.categories}
       />
 
       {/* FAVORITES / BOOKMARKS SIDE DRAWER */}

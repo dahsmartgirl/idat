@@ -2,7 +2,8 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCcw } from './icons';
 import type { CategoryType, FilterState } from '../types';
-import { ToolLogo } from './ToolLogos';
+import { ModelLogo, ToolLogo } from './ToolLogos';
+import { CATEGORIES, MODELS, TOOLS } from '../data/catalog';
 
 interface FilterDrawerProps {
   isOpen: boolean;
@@ -16,39 +17,11 @@ interface FilterDrawerProps {
   showStatus?: boolean;
 }
 
-const ALL_AI_TOOLS = [
-  { id: 'claude-code', name: 'Claude Code' },
-  { id: 'cursor', name: 'Cursor' },
-  { id: 'windsurf', name: 'Windsurf' },
-  { id: 'v0', name: 'v0' },
-  { id: 'bolt', name: 'Bolt' },
-  { id: 'lovable', name: 'Lovable' },
-  { id: 'replit-agent', name: 'Replit Agent' },
-  { id: 'gemini-cli', name: 'Gemini CLI' },
-  { id: 'midjourney', name: 'Midjourney' },
-  { id: 'fable-5', name: 'Fable 5' },
-];
+const ALL_AI_TOOLS = TOOLS;
 
-const ALL_CATEGORIES: CategoryType[] = [
-  'SaaS',
-  'Chrome Extensions',
-  'MCP Servers',
-  'APIs',
-  'Mobile Apps',
-  'Games',
-  'CLI Tools',
-  'VS Code Extensions',
-  'Experiments',
-];
+const ALL_CATEGORIES: CategoryType[] = [...CATEGORIES];
 
-const ALL_AI_MODELS = [
-  { id: 'claude-3.7', name: 'Claude 3.7 Sonnet', dotColor: '#D97757' },
-  { id: 'claude-3.5', name: 'Claude 3.5 Sonnet', dotColor: '#D97757' },
-  { id: 'gpt-4o', name: 'GPT-4o', dotColor: '#10B981' },
-  { id: 'gemini-2.0', name: 'Gemini 2.0 Flash', dotColor: '#0284C7' },
-  { id: 'deepseek-r1', name: 'DeepSeek R1', dotColor: '#3B82F6' },
-  { id: 'o3-mini', name: 'o3-mini', dotColor: '#10B981' },
-];
+const ALL_AI_MODELS = MODELS;
 
 export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   isOpen,
@@ -278,11 +251,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                             active ? '!bg-[#101010] !text-white' : 'hover:!bg-[#D9D9D9]'
                           }`}
                         >
-                          <ToolLogo
-                            toolId={t.id}
-                            size={11}
-                            className={active ? '[&>svg]:!fill-white [&>path]:!fill-white text-white' : ''}
-                          />
+                          <ToolLogo toolId={t.id} size={11} mono={active} className={active ? 'text-white' : ''} />
                           <span className={`text-mono-10 ${active ? '!text-white' : ''}`}>
                             {t.name}
                           </span>
@@ -345,10 +314,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                             active ? '!bg-[#101010] !text-white' : 'hover:!bg-[#D9D9D9]'
                           }`}
                         >
-                          <div
-                            className="w-1.5 h-1.5 shrink-0"
-                            style={{ backgroundColor: active ? '#FFFFFF' : m.dotColor }}
-                          />
+                          <ModelLogo model={m.name} size={11} mono={active} className={active ? 'text-white' : ''} />
                           <span className={`text-mono-10 ${active ? '!text-white' : ''}`}>
                             {m.name}
                           </span>

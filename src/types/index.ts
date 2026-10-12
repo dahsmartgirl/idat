@@ -1,16 +1,8 @@
 import type { MediaShot } from '../components/mockup/types';
+import type { CATEGORIES } from '../data/catalog';
 
-export type CategoryType = 
-  | 'All'
-  | 'SaaS' 
-  | 'Chrome Extensions' 
-  | 'MCP Servers' 
-  | 'APIs' 
-  | 'Mobile Apps' 
-  | 'Games' 
-  | 'CLI Tools' 
-  | 'VS Code Extensions' 
-  | 'Experiments';
+// Categories live in data/catalog.ts; 'All' is the filter-bar shortcut
+export type CategoryType = 'All' | (typeof CATEGORIES)[number];
 
 export interface AiTool {
   id: string;

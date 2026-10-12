@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, ChevronDown } from './icons';
 import type { Project, CategoryType } from '../types';
+import { CATEGORIES as ALL_CATEGORIES } from '../data/catalog';
 import { getBuilderGradient } from '../types';
 
 interface SubmitModalProps {
@@ -12,17 +13,7 @@ interface SubmitModalProps {
   editingProject?: Project | null;
 }
 
-const CATEGORIES: CategoryType[] = [
-  'SaaS',
-  'Chrome Extensions',
-  'MCP Servers',
-  'CLI Tools',
-  'Games',
-  'VS Code Extensions',
-  'Mobile Apps',
-  'APIs',
-  'Experiments'
-];
+const CATEGORIES: CategoryType[] = [...ALL_CATEGORIES];
 
 export const SubmitModal: React.FC<SubmitModalProps> = ({
   isOpen,

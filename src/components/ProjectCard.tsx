@@ -3,21 +3,11 @@ import type { Project } from '../types';
 import { getBuilderGradient } from '../types';
 import { Bookmark, ArrowUpRight } from './icons';
 import { useFavorites } from '../context/FavoritesContext';
-import { ToolLogo } from './ToolLogos';
+import { ModelLogo, ToolLogo } from './ToolLogos';
 import { motion } from 'framer-motion';
 import { MockupCanvas } from './mockup/MockupCanvas';
 import { getCanvasAspect, isDarkBackground } from './mockup/layout';
 
-const getModelColor = (modelName: string) => {
-  const lowercaseName = modelName.toLowerCase();
-  if (lowercaseName.includes('claude 3.7')) return '#D97757';
-  if (lowercaseName.includes('claude 3.5')) return '#D97757';
-  if (lowercaseName.includes('gpt-4o')) return '#10B981';
-  if (lowercaseName.includes('gemini 2.0')) return '#0284C7';
-  if (lowercaseName.includes('deepseek')) return '#3B82F6';
-  if (lowercaseName.includes('o3-mini')) return '#10B981';
-  return '#999999';
-};
 
 interface ProjectCardProps {
   project: Project;
@@ -252,10 +242,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
               )}
               {firstModel && (
                 <div className="tool-pill">
-                  <div
-                    className="w-1.5 h-1.5 shrink-0"
-                    style={{ backgroundColor: getModelColor(firstModel) }}
-                  />
+                  <ModelLogo model={firstModel} size={10} />
                   <span className="text-mono-10">{firstModel}</span>
                 </div>
               )}

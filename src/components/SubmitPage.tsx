@@ -5,7 +5,8 @@ import { ArrowRight, ArrowLeft, ChevronDown } from './icons';
 import type { Project, CategoryType } from '../types';
 import { getBuilderGradient } from '../types';
 import { ProjectCard } from './ProjectCard';
-import { ToolLogo } from './ToolLogos';
+import { ModelLogo, ToolLogo } from './ToolLogos';
+import { CATEGORIES as ALL_CATEGORIES, MODEL_NAMES, TOOLS } from '../data/catalog';
 import { MockupCanvas } from './mockup/MockupCanvas';
 import { MockupEditor, type MockupTab } from './mockup/MockupEditor';
 import { ShotStrip } from './mockup/ShotStrip';
@@ -17,32 +18,12 @@ interface SubmitPageProps {
   projects: Project[];
 }
 
-const CATEGORIES: CategoryType[] = [
-  'SaaS',
-  'Chrome Extensions',
-  'MCP Servers',
-  'CLI Tools',
-  'Games',
-  'VS Code Extensions',
-  'Mobile Apps',
-  'APIs',
-  'Experiments'
-];
+const CATEGORIES: CategoryType[] = [...ALL_CATEGORIES];
 
 const PREDEFINED_BUILDERS = ['ileri', 'josh', 'maya', 'sarah', 'alex'];
-const PREDEFINED_TOOLS = ['claude-code', 'cursor', 'windsurf', 'v0', 'bolt', 'lovable', 'replit-agent', 'gemini-cli', 'midjourney', 'fable-5'];
-const PREDEFINED_MODELS = ['Claude 3.7 Sonnet', 'Claude 3.5 Sonnet', 'GPT-4o', 'Gemini 2.0 Flash', 'DeepSeek R1', 'o3-mini'];
+const PREDEFINED_TOOLS = TOOLS.map((t) => t.id);
+const PREDEFINED_MODELS = MODEL_NAMES;
 
-const getModelColor = (modelName: string) => {
-  const lowercaseName = modelName.toLowerCase();
-  if (lowercaseName.includes('claude 3.7')) return '#D97757';
-  if (lowercaseName.includes('claude 3.5')) return '#D97757';
-  if (lowercaseName.includes('gpt-4o')) return '#10B981';
-  if (lowercaseName.includes('gemini 2.0')) return '#0284C7';
-  if (lowercaseName.includes('deepseek')) return '#3B82F6';
-  if (lowercaseName.includes('o3-mini')) return '#10B981';
-  return '#999999';
-};
 
 interface StepperProps {
   currentStep: number;
@@ -993,10 +974,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                             >
                               {selectedModels.map((m, i) => (
                                 <div key={i} className="input-tool-pill rounded-none border-none select-none">
-                                  <div
-                                    className="w-1.5 h-1.5 shrink-0"
-                                    style={{ backgroundColor: getModelColor(m) }}
-                                  />
+                                  <ModelLogo model={m} size={10} />
                                   <span className="text-mono-10 font-medium">{m}</span>
                                   <button
                                     type="button"
