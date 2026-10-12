@@ -1,8 +1,7 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Project } from '../types';
 import { ProjectCard } from './ProjectCard';
-import { getCanvasAspect } from './mockup/layout';
 import { SearchX, RotateCcw } from './icons';
 
 interface ProjectMasonryProps {
@@ -25,8 +24,6 @@ const MIN_COLUMN_WIDTH = 300;
 const PAGE_GUTTERS = 64;
 const COLUMN_GAP = 14;
 const ROW_GAP = 20;
-// Rough height of a card's title/tagline/pills footer, used until the real height is measured
-const FOOTER_ESTIMATE = 76;
 const MAX_COLUMNS = 7;
 
 const columnsForWidth = (width: number) => {
@@ -40,11 +37,6 @@ const columnsForWidth = (width: number) => {
   return Math.min(MAX_COLUMNS, Math.max(1, Math.min(fit, maxThatFit)));
 };
 
-const coverAspectFor = (project: Project, index: number) => {
-  const shot = project.media?.[0];
-  return shot ? getCanvasAspect(shot.settings, shot.width / shot.height || 1) : COVER_ASPECTS[index % COVER_ASPECTS.length];
-};
-
 export const ProjectMasonry = React.memo<ProjectMasonryProps>(function ProjectMasonry({
   projects,
   onSelectProject,
@@ -55,7 +47,6 @@ export const ProjectMasonry = React.memo<ProjectMasonryProps>(function ProjectMa
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [gridWidth, setGridWidth] = useState(() => (typeof window !== 'undefined' ? window.innerWidth - 64 : 1200));
-  const [heights, setHeights] = useState<Record<string, number>>({});
 
   // The grid (and its ref) only exists when there are projects to show
   const isEmpty = projects.length === 0;
@@ -74,55 +65,15 @@ export const ProjectMasonry = React.memo<ProjectMasonryProps>(function ProjectMa
     return () => observer.disconnect();
   }, [isEmpty]);
 
-  // One observer measures every card, so heights stay right as widths change (resize, zoom, text wrap)
-  const cardObserver = useRef<ResizeObserver | null>(null);
-  const refCallbacks = useRef(new Map<string, (el: HTMLDivElement | null) => void>());
-
-  useLayoutEffect(() => {
-    cardObserver.current = new ResizeObserver((entries) => {
-      setHeights((prev) => {
-        let next = prev;
-        for (const entry of entries) {
-          const id = (entry.target as HTMLElement).dataset.id!;
-          const h = Math.round(entry.borderBoxSize[0]?.blockSize ?? entry.contentRect.height);
-          if (prev[id] !== h) next = next === prev ? { ...prev, [id]: h } : Object.assign(next, { [id]: h });
-        }
-        return next;
-      });
-    });
-    return () => cardObserver.current?.disconnect();
-  }, []);
-
-  // Stable ref callback per card, so React doesn't detach/reattach the observer on every render
-  const measureRef = useCallback((id: string) => {
-    let cb = refCallbacks.current.get(id);
-    if (!cb) {
-      let current: HTMLDivElement | null = null;
-      cb = (el) => {
-        if (current) cardObserver.current?.unobserve(current);
-        current = el;
-        if (el) cardObserver.current?.observe(el);
-      };
-      refCallbacks.current.set(id, cb);
-    }
-    return cb;
-  }, []);
-
   const numCols = columnsForWidth(gridWidth);
-  const columnWidth = (gridWidth - COLUMN_GAP * (numCols - 1)) / numCols;
-
-  // Place cards round-robin (keeps left-to-right chronological order) under the previous card in their column
-  const layout = useMemo(() => {
-    const columnHeights = new Array(numCols).fill(0);
-    const positions = projects.map((project, index) => {
-      const col = index % numCols;
-      const height = heights[project.id] ?? columnWidth / coverAspectFor(project, index) + FOOTER_ESTIMATE;
-      const position = { x: col * (columnWidth + COLUMN_GAP), y: columnHeights[col] };
-      columnHeights[col] += height + ROW_GAP;
-      return position;
-    });
-    return { positions, height: Math.max(0, ...columnHeights) - ROW_GAP };
-  }, [projects, heights, numCols, columnWidth]);
+  // Deal cards round-robin into columns (keeps left-to-right chronological order). Each column is a
+  // plain flex stack, so the browser spaces cards itself: the gap is exactly ROW_GAP whatever the
+  // card heights are, with no JS measuring (measured heights went stale on iOS Safari)
+  const columns = useMemo(() => {
+    const cols: { project: Project; index: number }[][] = Array.from({ length: numCols }, () => []);
+    projects.forEach((project, index) => cols[index % numCols].push({ project, index }));
+    return cols;
+  }, [projects, numCols]);
 
   // Ultra-Clean & Minimalist Search Empty State
   if (isEmpty) {
@@ -160,21 +111,14 @@ export const ProjectMasonry = React.memo<ProjectMasonryProps>(function ProjectMa
     );
   }
 
-  // Cards live in one flat list and are only repositioned when columns change, never remounted
   return (
     <div ref={containerRef} className="w-full px-4 sm:px-8 py-2">
-      <div className="relative w-full" style={{ height: layout.height }}>
-        {projects.map((project, index) => {
-          const { x, y } = layout.positions[index];
-          return (
-            <div
-              key={project.id}
-              ref={measureRef(project.id)}
-              data-id={project.id}
-              className="absolute top-0 left-0"
-              style={{ width: columnWidth, transform: `translate(${x}px, ${y}px)` }}
-            >
+      <div className="flex items-start w-full" style={{ gap: COLUMN_GAP }}>
+        {columns.map((column, col) => (
+          <div key={col} className="flex flex-col flex-1 min-w-0" style={{ gap: ROW_GAP }}>
+            {column.map(({ project, index }) => (
               <motion.div
+                key={project.id}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: 'easeOut', delay: Math.min(index, 12) * 0.04 }}
@@ -187,9 +131,9 @@ export const ProjectMasonry = React.memo<ProjectMasonryProps>(function ProjectMa
                   onSelectBuilder={onSelectBuilder}
                 />
               </motion.div>
-            </div>
-          );
-        })}
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

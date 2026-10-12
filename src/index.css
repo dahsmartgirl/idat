@@ -17,15 +17,6 @@
   --color-page: #F2F1F3;
 }
 
-/* Avoid one-word last lines in body copy; even out line lengths in headings */
-p, li, figcaption, blockquote {
-  text-wrap: pretty;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  text-wrap: balance;
-}
-
 * {
   letter-spacing: 0 !important;
   scrollbar-width: thin;
