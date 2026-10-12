@@ -100,3 +100,20 @@ export const createShotFromFile = async (file: File, base?: MockupSettings): Pro
     throw err;
   }
 };
+
+// Whether a mockup background (solid, gradient or mesh CSS) reads as dark, by averaging the luminance of
+// its colours. Used to pick a legible colour for icons drawn on top of a mockup (e.g. the card bookmark).
+export const isDarkBackground = (background: string) => {
+  const hexes = background.match(/#[0-9a-f]{6}\b/gi);
+  if (!hexes) return false; // 'transparent' sits on the light grey card block
+  const luminance = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+      const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const average = hexes.reduce((sum, hex) => sum + luminance(hex), 0) / hexes.length;
+  // Prefer white whenever it reaches WCAG's 3:1 for icons: (1 + 0.05) / (L + 0.05) >= 3  =>  L <= 0.3
+  return average <= 0.3;
+};

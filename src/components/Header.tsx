@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
-    <header className="w-full px-4 sm:px-8 h-[56px] flex items-center justify-between bg-[#F2F1F3] relative z-20 overflow-hidden shrink-0 mt-2 sm:mt-3">
+    <header className="w-full px-4 sm:px-8 h-[64px] sm:h-[68px] pt-2 sm:pt-3 flex items-center justify-between bg-[#F2F1F3] sticky top-0 z-30 overflow-hidden shrink-0">
       
       {/* 1. Left Section: Logo -> Links back to mainpage (/) */}
       <motion.div

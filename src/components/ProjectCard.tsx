@@ -6,7 +6,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import { ToolLogo } from './ToolLogos';
 import { motion } from 'framer-motion';
 import { MockupCanvas } from './mockup/MockupCanvas';
-import { getCanvasAspect } from './mockup/layout';
+import { getCanvasAspect, isDarkBackground } from './mockup/layout';
 
 const getModelColor = (modelName: string) => {
   const lowercaseName = modelName.toLowerCase();
@@ -46,6 +46,14 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
   const coverShot = project.media?.[0];
   const aspect = coverShot ? getCanvasAspect(coverShot.settings, coverShot.width / coverShot.height || 1) : coverAspect;
 
+  // Bookmark sits on the mockup's background: white on dark backgrounds, near-black on light ones,
+  // and the usual grey on the plain grey block
+  const bookmarkColor = !coverShot
+    ? 'text-[#545454]'
+    : isDarkBackground(coverShot.settings.background)
+      ? 'text-white drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.35)]'
+      : 'text-[#101010]';
+
   const remainingCount = Math.max(0, (project.aiTools ? project.aiTools.length : 0) - 1) + Math.max(0, modelsArray.length - 1);
 
   return (
@@ -78,12 +86,12 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
               toggleFavorite(project.id);
             }
           }}
-          className={`absolute z-10 top-2.5 right-2.5 p-1 text-[#545454] ${project.media?.length || project.coverImage ? 'bg-[#F2F1F3]/85 rounded-full' : ''} hover:opacity-80 transition-transform active:scale-90`}
+          className={`absolute z-10 top-2.5 right-2.5 p-1 ${bookmarkColor} hover:opacity-80 transition-transform active:scale-90`}
           title={favorited ? 'Remove Bookmark' : 'Bookmark Thing'}
           aria-label={favorited ? 'Remove bookmark' : 'Bookmark this thing'}
         >
           <Bookmark 
-            className={`w-4 h-4 ${favorited ? 'fill-[#545454]' : ''}`} 
+            className={`w-4 h-4 ${favorited ? 'fill-current' : ''}`} 
             strokeWidth={1.5}
           />
         </button>
