@@ -14,6 +14,8 @@ import {
   FilterHorizontalIcon,
   GitForkIcon,
   GithubIcon,
+  Image01Icon,
+  Link01Icon,
   NewTwitterIcon,
   PencilEdit02Icon,
   PlusSignIcon,
@@ -41,6 +43,8 @@ export const ChevronLeft = (props: IconProps) => <HugeiconsIcon icon={ArrowLeft0
 export const ChevronRight = (props: IconProps) => <HugeiconsIcon icon={ArrowRight01Icon} {...defaults} {...props} />;
 export const Copy = (props: IconProps) => <HugeiconsIcon icon={Copy01Icon} {...defaults} {...props} />;
 export const Edit = (props: IconProps) => <HugeiconsIcon icon={PencilEdit02Icon} {...defaults} {...props} />;
+export const ImageIcon = (props: IconProps) => <HugeiconsIcon icon={Image01Icon} {...defaults} {...props} />;
+export const LinkIcon = (props: IconProps) => <HugeiconsIcon icon={Link01Icon} {...defaults} {...props} />;
 export const Github = (props: IconProps) => <HugeiconsIcon icon={GithubIcon} {...defaults} {...props} />;
 export const GitFork = (props: IconProps) => <HugeiconsIcon icon={GitForkIcon} {...defaults} {...props} />;
 export const Maximize2 = (props: IconProps) => <HugeiconsIcon icon={ArrowExpand01Icon} {...defaults} {...props} />;

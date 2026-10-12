@@ -3,6 +3,7 @@ import type { Project } from '../types';
 import { getBuilderGradient } from '../types';
 import { Bookmark, ArrowUpRight } from './icons';
 import { useFavorites } from '../context/FavoritesContext';
+import { useClaims } from '../context/ClaimsContext';
 import { ModelLogo, ToolLogo } from './ToolLogos';
 import { motion } from 'framer-motion';
 import { MockupCanvas } from './mockup/MockupCanvas';
@@ -26,6 +27,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
   onSelectBuilder,
 }) {
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { isClaimPending } = useClaims();
   const [localFavorite, setLocalFavorite] = React.useState(false);
   const favorited = project.id === 'temp-preview-id' ? localFavorite : isFavorite(project.id);
 
@@ -165,6 +167,11 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
                   />
                 </div>
               )
+            ) : isClaimPending(project.id) ? (
+              // You've sent a claim; it's being checked
+              <span className="badge-unclaimed shrink-0" title="Your claim is being checked">
+                claim pending
+              </span>
             ) : (
               <button
                 onClick={(e) => {
@@ -200,7 +207,7 @@ export const ProjectCard = React.memo<ProjectCardProps>(function ProjectCard({
             project.tagline
           ) : (
             <span className="block relative overflow-hidden bg-[#E9E9E9] h-3.5 w-48 rounded-none">
-              <motion.div
+              <motion.span
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
                 initial={{ x: '-100%' }}
                 animate={{ x: '100%' }}

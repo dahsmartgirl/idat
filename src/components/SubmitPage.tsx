@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft, ChevronDown } from './icons';
 import type { Project, CategoryType } from '../types';
-import { getBuilderGradient } from '../types';
 import { ProjectCard } from './ProjectCard';
 import { ModelLogo, ToolLogo } from './ToolLogos';
 import { CATEGORIES as ALL_CATEGORIES, MODEL_NAMES, TOOLS } from '../data/catalog';
@@ -12,7 +11,10 @@ import { MockupEditor, type MockupTab } from './mockup/MockupEditor';
 import { ShotStrip } from './mockup/ShotStrip';
 import { createShotFromFile } from './mockup/layout';
 import type { MediaShot, MockupSettings } from './mockup/types';
+import { BuilderTagInput } from './BuilderTagInput';
 import { slugify } from '../lib/paths';
+import { INVALID_URL_MESSAGE, isBlankUrl, isValidUrl } from '../lib/url';
+import { UrlInput } from './UrlInput';
 
 interface SubmitPageProps {
   onSubmitSuccess: (newProject: Partial<Project>) => void;
@@ -21,7 +23,6 @@ interface SubmitPageProps {
 
 const CATEGORIES: CategoryType[] = [...ALL_CATEGORIES];
 
-const PREDEFINED_BUILDERS = ['ileri', 'josh', 'maya', 'sarah', 'alex'];
 const PREDEFINED_TOOLS = TOOLS.map((t) => t.id);
 const PREDEFINED_MODELS = MODEL_NAMES;
 
@@ -104,10 +105,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   const [githubUrl, setGitHubUrl] = useState('');
 
   // Creators Tag Pills & Autocomplete
-  const [creatorInput, setCreatorInput] = useState('');
   const [creators, setCreators] = useState<string[]>(['ileri']);
-  const [activeBuilderSuggestion, setActiveBuilderSuggestion] = useState(0);
-  const creatorInputRef = useRef<HTMLInputElement>(null);
 
   // AI Stack Tag Pills & Autocomplete
   const [toolInput, setToolInput] = useState('');
@@ -127,6 +125,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   const [nameTouched, setNameTouched] = useState(false);
   const [taglineTouched, setTaglineTouched] = useState(false);
   const [demoUrlTouched, setDemoUrlTouched] = useState(false);
+  const [githubUrlTouched, setGithubUrlTouched] = useState(false);
   const [creatorsTouched, setCreatorsTouched] = useState(false);
   const [toolsTouched, setToolsTouched] = useState(false);
   const [modelsTouched, setModelsTouched] = useState(false);
@@ -214,12 +213,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   }, [isEditing, editingProject]);
 
   // Derived Suggestion Lists
-  const cleanCreatorInput = creatorInput.trim().replace('@', '');
-  const builderSuggestions = PREDEFINED_BUILDERS.filter(b => 
-    (cleanCreatorInput === '' || b.toLowerCase().includes(cleanCreatorInput.toLowerCase())) && 
-    !creators.includes(b)
-  );
-
   const toolSuggestions = PREDEFINED_TOOLS.filter(t => 
     t.toLowerCase().includes(toolInput.toLowerCase().trim()) && 
     !selectedTools.includes(t)
@@ -259,24 +252,6 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   };
 
   // Tag Builders Helpers
-  const handleAddCreator = () => {
-    const trimmed = creatorInput.trim().toLowerCase().replace('@', '');
-    const match = PREDEFINED_BUILDERS.find(b => b.toLowerCase() === trimmed);
-    if (match && !creators.includes(match)) {
-      setCreators([...creators, match]);
-      setCreatorInput('');
-      setCreatorsTouched(true);
-      setActiveBuilderSuggestion(0);
-    }
-  };
-
-  const handleRemoveCreator = (index: number) => {
-    if (creators[index].toLowerCase() === 'ileri') return;
-    const nextCreators = creators.filter((_, i) => i !== index);
-    setCreators(nextCreators);
-    setCreatorsTouched(true);
-  };
-
   // Tag Tools Helpers
   const handleAddTool = () => {
     const trimmed = toolInput.trim().toLowerCase();
@@ -369,8 +344,8 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   const isStep1Valid = () => {
     return name.trim().length > 0 &&
            tagline.trim().length > 0 &&
-           demoUrl.trim().length > 0 &&
-           demoUrl !== 'https://' &&
+           isValidUrl(demoUrl) &&
+           (isBlankUrl(githubUrl) || isValidUrl(githubUrl)) &&
            creators.length > 0 &&
            selectedTools.length > 0 &&
            selectedModels.length > 0 &&
@@ -381,6 +356,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
     setNameTouched(true);
     setTaglineTouched(true);
     setDemoUrlTouched(true);
+    setGithubUrlTouched(true);
     setCreatorsTouched(true);
     setToolsTouched(true);
     setModelsTouched(true);
@@ -402,6 +378,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
     setNameTouched(true);
     setTaglineTouched(true);
     setDemoUrlTouched(true);
+    setGithubUrlTouched(true);
     setCreatorsTouched(true);
     setToolsTouched(true);
     setModelsTouched(true);
@@ -573,7 +550,9 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
   // Error condition indicators
   const nameHasError = nameTouched && !name.trim();
   const taglineHasError = taglineTouched && !tagline.trim();
-  const demoUrlHasError = demoUrlTouched && !demoUrl.trim();
+  const demoUrlHasError = demoUrlTouched && !isValidUrl(demoUrl);
+  // The remix link is optional, but has to be a real link when given
+  const githubUrlHasError = githubUrlTouched && !isBlankUrl(githubUrl) && !isValidUrl(githubUrl);
   const creatorsHasError = creatorsTouched && creators.length === 0;
   const toolsHasError = toolsTouched && selectedTools.length === 0;
   const modelsHasError = modelsTouched && selectedModels.length === 0;
@@ -646,7 +625,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         {/* Name of thing */}
                         <div>
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">name of thing *</label>
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">name of thing *</label>
                           <input
                             type="text"
                             required
@@ -666,7 +645,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
 
                         {/* Custom dropdown */}
                         <div className="relative" ref={dropdownRef}>
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">category *</label>
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">category *</label>
                           <button
                             type="button"
                             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
@@ -699,7 +678,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       {/* Tagline */}
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <label className="text-inter-14 text-[#101010] font-medium lowercase">one-liner tagline *</label>
+                          <label className="text-inter-14 !text-[#101010] font-medium lowercase">one-liner tagline *</label>
                           <span className="text-mono-10 text-[#999999]">{tagline.length}/120</span>
                         </div>
                         <input
@@ -723,152 +702,57 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       {/* Links */}
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">live link *</label>
-                          <input
-                            type="url"
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">live link *</label>
+                          <UrlInput
                             required
                             value={demoUrl}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (!val.startsWith('https://')) {
-                                setDemoUrl('https://');
-                              } else {
-                                setDemoUrl(val);
-                              }
+                            onChange={(v) => {
+                              setDemoUrl(v);
                               if (demoUrlTouched) setDemoUrlTouched(false);
                             }}
-                            onFocus={() => {
-                              if (!demoUrl) setDemoUrl('https://');
-                            }}
-                            onBlur={() => {
-                              setDemoUrlTouched(true);
-                              if (demoUrl === 'https://') setDemoUrl('');
-                            }}
-                            placeholder="https://"
-                            className={`submit-input-text ${demoUrlHasError ? 'error' : ''}`}
+                            onBlur={() => setDemoUrlTouched(true)}
+                            hasError={demoUrlHasError}
                           />
                           {demoUrlHasError && (
-                          <span className="text-[11px] text-red-500 mt-1 block font-sans font-normal lowercase">live link is required</span>
+                          <span className="text-[11px] text-red-500 mt-1 block font-sans font-normal lowercase">
+                            {isBlankUrl(demoUrl) ? 'live link is required' : INVALID_URL_MESSAGE}
+                          </span>
                         )}
                         </div>
 
                         <div>
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">remix link</label>
-                          <input
-                            type="url"
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">remix link</label>
+                          <UrlInput
                             value={githubUrl}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (!val.startsWith('https://')) {
-                                setGitHubUrl('https://');
-                              } else {
-                                setGitHubUrl(val);
-                              }
+                            onChange={(v) => {
+                              setGitHubUrl(v);
+                              setGithubUrlTouched(false);
                             }}
-                            onFocus={() => {
-                              if (!githubUrl) setGitHubUrl('https://');
-                            }}
-                            onBlur={() => {
-                              if (githubUrl === 'https://') setGitHubUrl('');
-                            }}
-                            placeholder="https://"
-                            className="submit-input-text"
+                            onBlur={() => setGithubUrlTouched(true)}
+                            hasError={githubUrlHasError}
                           />
+                          {githubUrlHasError && (
+                            <span className="text-[11px] text-red-500 mt-1 block font-sans font-normal lowercase">{INVALID_URL_MESSAGE}</span>
+                          )}
                           <p className="text-[11px] text-[#999999] mt-1 font-sans font-normal lowercase">input link to code repository or shared tool builder editor link</p>
                         </div>
                       </div>
 
                       {/* Builders Tag Box with Autocomplete Suggestions */}
                       <div>
-                        <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">builders *</label>
-                        <div className="relative">
-                          <div 
-                            onClick={() => creatorInputRef.current?.focus()}
-                            className={`submit-tagbox-container items-center gap-1.5 flex flex-wrap p-2 min-h-[42px] ${creatorsHasError ? 'error' : ''}`}
-                          >
-                            {creators.map((c, i) => (
-                              <div key={i} className="input-tool-pill rounded-none border-none select-none">
-                                <div className={`w-3.5 h-3.5 rounded-full ${getBuilderGradient(c)} shrink-0`} />
-                                <span className="text-mono-10 !text-[#0011FF] font-medium">@{c}</span>
-                                {c.toLowerCase() !== 'ileri' && (
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleRemoveCreator(i);
-                                    }}
-                                    className="text-[#101010] hover:text-red-500 font-bold ml-0.5 text-[11px]"
-                                    title={`Remove @${c}`}
-                                  >
-                                    ×
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                            <input
-                              type="text"
-                              ref={creatorInputRef}
-                              value={creatorInput}
-                              onChange={(e) => {
-                                setCreatorInput(e.target.value);
-                                setActiveBuilderSuggestion(0);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  if (builderSuggestions.length > 0 && activeBuilderSuggestion < builderSuggestions.length) {
-                                    const selected = builderSuggestions[activeBuilderSuggestion];
-                                    setCreators([...creators, selected]);
-                                    setCreatorInput('');
-                                    setCreatorsTouched(true);
-                                    setActiveBuilderSuggestion(0);
-                                  } else {
-                                    handleAddCreator();
-                                  }
-                                } else if (e.key === 'ArrowDown') {
-                                  e.preventDefault();
-                                  setActiveBuilderSuggestion(prev => (prev + 1) % Math.max(1, builderSuggestions.length));
-                                } else if (e.key === 'ArrowUp') {
-                                  e.preventDefault();
-                                  setActiveBuilderSuggestion(prev => (prev - 1 + builderSuggestions.length) % Math.max(1, builderSuggestions.length));
-                                } else if (e.key === 'Escape') {
-                                  setCreatorInput('');
-                                } else if (e.key === ' ' || e.key === ',') {
-                                  e.preventDefault();
-                                  handleAddCreator();
-                                } else if (e.key === 'Backspace' && creatorInput === '') {
-                                  if (creators.length > 1) {
-                                    handleRemoveCreator(creators.length - 1);
-                                  }
-                                }
-                              }}
-                              onBlur={() => {
-                                setTimeout(() => setCreatorsTouched(true), 200);
-                              }}
-                              placeholder={creators.length === 0 ? "add creator..." : ""}
-                              className="flex-1 bg-transparent border-none outline-none text-[12px] font-mono placeholder:text-[#999999] min-w-[80px]"
-                            />
-                          </div>
-                          {creatorInput.trim() !== '' && builderSuggestions.length > 0 && (
-                            <div className="submit-suggestion-menu">
-                              {builderSuggestions.map((b, idx) => (
-                                <button
-                                  key={b}
-                                  type="button"
-                                  onClick={() => {
-                                    setCreators([...creators, b]);
-                                    setCreatorInput('');
-                                    setCreatorsTouched(true);
-                                    setActiveBuilderSuggestion(0);
-                                  }}
-                                  className={`submit-suggestion-item ${idx === activeBuilderSuggestion ? 'active' : ''}`}
-                                >
-                                  {b}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                        <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">builders *</label>
+                        <BuilderTagInput
+                          builders={creators}
+                          onChange={(next) => {
+                            setCreators(next);
+                            setCreatorsTouched(true);
+                          }}
+                          locked={['ileri']}
+                          hasError={creatorsHasError}
+                          onBlur={() => {
+                            setTimeout(() => setCreatorsTouched(true), 200);
+                          }}
+                        />
                         {creatorsHasError && (
                           <p className="text-[11px] mt-1 font-sans font-normal lowercase text-red-500">at least one builder is required</p>
                         )}
@@ -878,7 +762,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       <div className="space-y-3.5">
                         {/* AI Tools (built with) with Autocomplete Suggestions */}
                         <div>
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">built with *</label>
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">built with *</label>
                           <div className="relative">
                             <div 
                               onClick={() => toolInputRef.current?.focus()}
@@ -968,7 +852,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
 
                         {/* AI Models with Autocomplete Suggestions */}
                         <div>
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">ai models *</label>
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">ai models *</label>
                           <div className="relative">
                             <div 
                               onClick={() => modelInputRef.current?.focus()}
@@ -1059,7 +943,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
 
                       {/* Build Notes */}
                       <div>
-                        <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">build notes *</label>
+                        <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">build notes *</label>
                         <textarea
                           rows={6}
                           required
@@ -1093,7 +977,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       {/* Shots: upload, pick, reorder */}
                       <div>
                         <div className="flex items-baseline justify-between mb-1">
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase">showcase shots</label>
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase">showcase shots</label>
                           {shots.length > 0 && (
                             <span className="text-mono-10">drag to reorder · first is the cover</span>
                           )}
@@ -1115,7 +999,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
                       {/* Mockup controls for the selected shot */}
                       {activeShot && (
                         <div>
-                          <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1.5">mockup</label>
+                          <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1.5">mockup</label>
                           <MockupEditor
                             settings={activeShot.settings}
                             onChange={updateActiveSettings}
@@ -1129,7 +1013,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
 
                       {/* Optional demo video link */}
                       <div>
-                        <label className="block text-inter-14 text-[#101010] font-medium lowercase mb-1">
+                        <label className="block text-inter-14 !text-[#101010] font-medium lowercase mb-1">
                           demo video link <span className="text-mono-10">optional</span>
                         </label>
                         <input

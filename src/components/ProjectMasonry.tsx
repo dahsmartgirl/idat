@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Project } from '../types';
 import { ProjectCard } from './ProjectCard';
-import { SearchX, RotateCcw } from './icons';
+import { EmptyState } from './EmptyState';
 
 interface ProjectMasonryProps {
   projects: Project[];
@@ -75,39 +75,22 @@ export const ProjectMasonry = React.memo<ProjectMasonryProps>(function ProjectMa
     return cols;
   }, [projects, numCols]);
 
-  // Ultra-Clean & Minimalist Search Empty State
+  // Nothing matches the search or filters: say so, and offer the way out
   if (isEmpty) {
     return (
-      <div className="w-full px-4 sm:px-8 py-20 flex flex-col items-center justify-center text-center">
-        <div className="flex flex-col items-center gap-3">
-          
-          {/* Minimalist Icon Badge */}
-          <div className="w-10 h-10 rounded-full bg-[#E9E9E9] flex items-center justify-center text-[#101010] mb-1">
-            <SearchX className="w-4 h-4 stroke-[1.8]" />
-          </div>
-
-          {/* Clean Copy */}
-          <h3 className="text-inter-16 !text-[#101010] font-medium tracking-tight">
-            {searchQuery ? `no things found for "${searchQuery}"` : 'no matching things'}
-          </h3>
-          <p className="text-inter-14 text-secondary/70 max-w-xs leading-relaxed">
-            Try clearing your search query or adjusting your filters.
-          </p>
-
-          {/* Only Button: clear search */}
-          {onClearSearch && (
-            <button
-              onClick={onClearSearch}
-              className="btn-main flex items-center gap-1 cursor-pointer mt-2"
-              title="Clear search and filters"
-            >
-              <RotateCcw className="w-3 h-3 stroke-[2]" />
-              <span>clear search</span>
+      <EmptyState
+        art="search"
+        className="py-16"
+        title={searchQuery ? `nothing matches “${searchQuery}”` : 'nothing matches these filters'}
+        text={searchQuery ? 'try a different word, or fewer filters.' : 'try removing a filter or two.'}
+        actions={
+          onClearSearch && (
+            <button onClick={onClearSearch} className="btn-main">
+              {searchQuery ? 'clear search and filters' : 'clear filters'}
             </button>
-          )}
-
-        </div>
-      </div>
+          )
+        }
+      />
     );
   }
 

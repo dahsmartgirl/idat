@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import type { Project, FilterState } from '../types';
 import { getBuilderGradient, EMPTY_FILTERS } from '../types';
-import { MOCK_BUILDERS, MOCK_PROJECTS } from '../data/mockData';
+import { MOCK_BUILDERS } from '../data/mockData';
 import { Github, XLogo } from './icons';
 import { ProjectMasonry } from './ProjectMasonry';
 import { FilterDrawer } from './FilterDrawer';
 import { FilterRow } from './ToolFilterBar';
+import { EmptyState } from './EmptyState';
+import { NotFoundPage } from './NotFoundPage';
+import { CURRENT_USER } from '../lib/session';
 import { ToolLogo } from './ToolLogos';
 
 interface BuilderProfilePageProps {
@@ -14,7 +18,9 @@ interface BuilderProfilePageProps {
   onSelectProject: (project: Project) => void;
   onOpenClaim: (project: Project) => void;
   onSelectBuilder: (handle: string) => void;
+  projects: Project[];
   searchQuery?: string;
+  onClearSearch?: () => void;
   activeProject?: Project | null;
 }
 
@@ -66,7 +72,9 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
   onSelectProject,
   onOpenClaim,
   onSelectBuilder,
+  projects,
   searchQuery = '',
+  onClearSearch,
   activeProject = null,
 }) => {
   const cleanHandle = (username || 'ileri').replace('@', '').toLowerCase();
@@ -87,14 +95,14 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
     websiteUrl: `https://${cleanHandle}.dev`,
   };
 
-  // Raw builder projects (falls back to showcase projects so direct URL visits always render smoothly!)
-  const allBuilderProjects = useMemo(() => {
-    const found = MOCK_PROJECTS.filter((p) =>
-      p.claimedBy.some((handle) => handle.toLowerCase() === cleanHandle)
-    );
-    if (found.length > 0) return found;
-    return MOCK_PROJECTS.slice(0, 3);
-  }, [cleanHandle]);
+  // This builder's projects (live, so a project claimed a moment ago is already here)
+  const allBuilderProjects = useMemo(
+    () => projects.filter((p) => p.claimedBy.some((handle) => handle.toLowerCase() === cleanHandle)),
+    [projects, cleanHandle]
+  );
+  // Nobody by this name: no builder record and no projects
+  const builderExists = !!MOCK_BUILDERS[cleanHandle] || allBuilderProjects.length > 0;
+  const isOwnProfile = cleanHandle === CURRENT_USER;
 
   // Extract builder-specific filter options
   const availableTools = useMemo(() => {
@@ -193,6 +201,8 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
     }
     return 0;
   }, [activeProject, isFilterDrawerOpen, windowWidth]);
+
+  if (!builderExists) return <NotFoundPage kind="profile" handle={cleanHandle} />;
 
   return (
     <div className="w-full relative">
@@ -316,46 +326,63 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
 
         </div>
 
-        {/* Tabs Header: "3 things." + Filter Button */}
-        <div className="w-full pt-2">
+        {allBuilderProjects.length === 0 ? (
+          // No projects yet: an invitation on your own profile, a way back to the feed on others'
+          <EmptyState
+            art="empty"
+            className="py-12"
+            title={isOwnProfile ? 'your shelf is empty' : `@${builder.username} hasn’t added anything yet`}
+            text={
+              isOwnProfile
+                ? 'add the first thing you built with ai and it’ll live here.'
+                : 'check back soon, or see what everyone else is building.'
+            }
+            actions={
+              isOwnProfile ? (
+                <Link to="/new" className="btn-main">add your first thing</Link>
+              ) : (
+                <Link to="/" className="btn-main">browse all things</Link>
+              )
+            }
+          />
+        ) : (
+          // Tabs Header: "3 things." + Filter Button
+          <div className="w-full pt-2">
           
-          {/* Row: "3 things." (Solid #545454 grey text) + Filter Button */}
-          <FilterRow
-            className="px-4 sm:px-8 py-2"
-            onOpen={() => setIsFilterDrawerOpen(true)}
-            activeCount={activeFilterCount}
-            onClear={() => setFilters(EMPTY_FILTERS)}
-          >
-            <div className="flex items-baseline gap-1">
-              <span className="text-mono-20 text-secondary">
-                <ScrambleNumber value={filteredBuilderProjects.length} color="var(--color-secondary)" />
-              </span>
-              <span className="text-inter-20 text-secondary">
-                {filteredBuilderProjects.length === 1 ? 'thing.' : 'things.'}
-              </span>
+            {/* Row: "3 things." (Solid #545454 grey text) + Filter Button */}
+            <FilterRow
+              className="px-4 sm:px-8 py-2"
+              onOpen={() => setIsFilterDrawerOpen(true)}
+              activeCount={activeFilterCount}
+              onClear={() => setFilters(EMPTY_FILTERS)}
+            >
+              <div className="flex items-baseline gap-1">
+                <span className="text-mono-20 text-secondary">
+                  <ScrambleNumber value={filteredBuilderProjects.length} color="var(--color-secondary)" />
+                </span>
+                <span className="text-inter-20 text-secondary">
+                  {filteredBuilderProjects.length === 1 ? 'thing.' : 'things.'}
+                </span>
+              </div>
+            </FilterRow>
+
+            {/* Projects Showcase Masonry Grid */}
+            <div className="pt-2">
+              <ProjectMasonry
+                projects={filteredBuilderProjects}
+                searchQuery={searchQuery}
+                onClearSearch={() => {
+                  setFilters(EMPTY_FILTERS);
+                  onClearSearch?.();
+                }}
+                onSelectProject={onSelectProject}
+                onOpenClaim={onOpenClaim}
+                onSelectBuilder={onSelectBuilder}
+              />
             </div>
-          </FilterRow>
 
-          {/* Projects Showcase Masonry Grid */}
-          <div className="pt-2">
-            <ProjectMasonry
-              projects={filteredBuilderProjects}
-              searchQuery={searchQuery}
-              onClearSearch={() => {
-                setFilters({
-                  aiTools: [],
-                  categories: [],
-                  aiModels: [],
-                  status: 'all',
-                });
-              }}
-              onSelectProject={onSelectProject}
-              onOpenClaim={onOpenClaim}
-              onSelectBuilder={onSelectBuilder}
-            />
           </div>
-
-        </div>
+        )}
 
       </motion.div>
 

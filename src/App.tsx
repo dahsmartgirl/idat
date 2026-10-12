@@ -2,12 +2,14 @@ import { useState, useMemo, useEffect, useLayoutEffect, useCallback, useRef, typ
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useNavigationType, useParams, type Location } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FavoritesProvider } from './context/FavoritesContext';
+import { ClaimsProvider, useClaims } from './context/ClaimsContext';
 import { Header } from './components/Header';
 import { ToolFilterBar } from './components/ToolFilterBar';
 import { ProjectMasonry } from './components/ProjectMasonry';
 import { ProjectDrawer } from './components/ProjectDrawer';
 import { BuilderProfilePage } from './components/BuilderProfilePage';
-import { SubmitModal } from './components/SubmitModal';
+import { ClaimModal, type ClaimRequest } from './components/ClaimModal';
+import { NotFoundPage } from './components/NotFoundPage';
 import { SubmitPage } from './components/SubmitPage';
 import { ProjectPage } from './components/ProjectPage';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
@@ -61,8 +63,6 @@ function AppLayout() {
   const [activeProjectPath, setActiveProjectPath] = useState('');
   const openProject = activeProject && activeProjectPath === location.pathname ? activeProject : null;
   const [claimingProject, setClaimingProject] = useState<Project | null>(null);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   // While the drawer expands into the full page, the page behind slides back under the header
   const [isExpanding, setIsExpanding] = useState(false);
@@ -188,8 +188,16 @@ function AppLayout() {
 
   const handleOpenClaim = useCallback((project: Project) => {
     setClaimingProject(project);
-    setIsSubmitOpen(true);
   }, []);
+
+  // A claim only changes the project once it's confirmed (automatically, by the backend), and the claimer and
+  // co-builders are told by email. Until then the project just shows "claim pending" to you
+  const { addPendingClaim } = useClaims();
+  const handleClaim = useCallback((request: ClaimRequest) => {
+    addPendingClaim(request.project.id);
+  }, [addPendingClaim]);
+
+  const closeClaim = useCallback(() => setClaimingProject(null), []);
 
   const handleEditProject = useCallback((project: Project) => {
     setActiveProject(null);
@@ -204,52 +212,29 @@ function AppLayout() {
   }, []);
 
   const handleAddProject = (newProjectData: Partial<Project>) => {
-    if (claimingProject) {
-      setProjects((prev) =>
-        prev.map((p) =>
-          p.id === claimingProject.id
-            ? { 
-                ...p, 
-                isClaimed: true, 
-                claimedBy: newProjectData.claimedBy || ['ileri'],
-                demoUrl: newProjectData.demoUrl || p.demoUrl,
-                githubUrl: newProjectData.githubUrl || p.githubUrl,
-                youtubeUrl: newProjectData.youtubeUrl || p.youtubeUrl,
-              }
-            : p
-        )
-      );
-      if (activeProject && activeProject.id === claimingProject.id) {
-        setActiveProject((prev) => prev ? {
-          ...prev,
-          isClaimed: true,
-          claimedBy: newProjectData.claimedBy || ['ileri'],
-          demoUrl: newProjectData.demoUrl || prev.demoUrl,
-          githubUrl: newProjectData.githubUrl || prev.githubUrl,
-          youtubeUrl: newProjectData.youtubeUrl || prev.youtubeUrl,
-        } : null);
-      }
-      setClaimingProject(null);
-    } else if (editingProject || projects.some((p) => p.id === newProjectData.id)) {
-      // Edits come from the old modal (editingProject) or from /edit/:slug (full project with its id)
-      const editedId = editingProject?.id ?? newProjectData.id;
+    // Edits from /edit/:slug come back as the full project, with its id
+    if (projects.some((p) => p.id === newProjectData.id)) {
+      const editedId = newProjectData.id;
       setProjects((prev) =>
         prev.map((p) => (p.id === editedId ? { ...p, ...newProjectData } as Project : p))
       );
       if (activeProject && activeProject.id === editedId) {
         setActiveProject((prev) => prev ? { ...prev, ...newProjectData } as Project : null);
       }
-      setEditingProject(null);
     } else {
       setProjects((prev) => [newProjectData as Project, ...prev]);
     }
   };
 
+  const clearSearch = useCallback(() => setSearchQuery(''), []);
+
   const renderProfilePage = (username: string) => (
     <BuilderProfilePage
       key={username}
       username={username}
+      projects={projects}
       searchQuery={searchQuery}
+      onClearSearch={clearSearch}
       onSelectProject={handleSelectProject}
       onOpenClaim={handleOpenClaim}
       onSelectBuilder={handleSelectBuilder}
@@ -339,6 +324,11 @@ function AppLayout() {
                   {/* MASONRY PROJECT GRID */}
                   <ProjectMasonry
                     projects={filteredProjects}
+                    searchQuery={searchQuery}
+                    onClearSearch={() => {
+                      clearSearch();
+                      setFilters(EMPTY_FILTERS);
+                    }}
                     onSelectProject={handleSelectProject}
                     onOpenClaim={handleOpenClaim}
                     onSelectBuilder={handleSelectBuilder}
@@ -364,7 +354,7 @@ function AppLayout() {
             <Route path="/b/:username" element={<LegacyProfileRedirect />} />
             <Route path="/builder/:username" element={<LegacyProfileRedirect />} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           </div>
 
@@ -412,28 +402,19 @@ function AppLayout() {
         onSelectProject={handleSelectProject}
       />
 
-      {/* SUBMIT / CLAIM / EDIT MODAL */}
-      <SubmitModal
-        isOpen={isSubmitOpen}
-        onClose={() => {
-          setIsSubmitOpen(false);
-          setClaimingProject(null);
-          setEditingProject(null);
-        }}
-        onSubmitSuccess={handleAddProject}
-        claimingProject={claimingProject}
-        editingProject={editingProject}
-      />
+      {/* CLAIM MODAL */}
+      <ClaimModal project={claimingProject} onClose={closeClaim} onClaim={handleClaim} />
 
     </div>
   );
 }
 
-// Paths whose first segment starts with @ belong to a builder; any other single word is an old profile link
+// Paths whose first segment starts with @ belong to a builder; any other single word is an old profile link,
+// and anything else isn't a page
 function HandleRoute({ render }: { render: (username: string) => ReactNode }) {
   const { handle = '', slug } = useParams<{ handle: string; slug?: string }>();
   if (!handle.startsWith('@')) {
-    return <Navigate to={slug ? '/' : profilePath(handle)} replace />;
+    return slug ? <NotFoundPage /> : <Navigate to={profilePath(handle)} replace />;
   }
   return <>{render(handle.slice(1).toLowerCase())}</>;
 }
@@ -442,7 +423,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <FavoritesProvider>
-        <AppLayout />
+        <ClaimsProvider>
+          <AppLayout />
+        </ClaimsProvider>
       </FavoritesProvider>
     </BrowserRouter>
   );

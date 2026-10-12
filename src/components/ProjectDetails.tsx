@@ -19,6 +19,7 @@ import {
   X
 } from './icons';
 import { useFavorites } from '../context/FavoritesContext';
+import { useClaims } from '../context/ClaimsContext';
 import { SITE_URL, handleFromPath, projectPath } from '../lib/paths';
 
 // Everything shown for a project, shared by the side drawer and the full project page
@@ -49,20 +50,32 @@ const getYouTubeEmbedUrl = (url?: string) => {
 };
 
 // "Is this your thing? claim" bar shown above unclaimed projects
-export const UnclaimedBanner: React.FC<{ project: Project; onOpenClaim: (project: Project) => void }> = ({ project, onOpenClaim }) => (
-  <div
-    onClick={() => onOpenClaim(project)}
-    className="w-full bg-[#101010] py-2.5 px-6 sm:px-8 flex items-center justify-between cursor-pointer rounded-none group shrink-0 z-40"
-  >
-    <span className="font-sans text-[11.5px] font-normal text-white/90 leading-none">
-      Is this your thing?
-    </span>
-    <div className="flex items-center gap-1 font-sans text-[11.5px] font-normal text-white/90 leading-none">
-      <span className="leading-none">claim</span>
-      <ArrowRight className="w-3.5 h-3.5 shrink-0 text-white/90 group-hover:translate-x-0.5 transition-transform duration-200" />
+export const UnclaimedBanner: React.FC<{ project: Project; onOpenClaim: (project: Project) => void }> = ({ project, onOpenClaim }) => {
+  const pending = useClaims().isClaimPending(project.id);
+  // Claim sent: say it's being checked, nothing to click
+  if (pending) {
+    return (
+      <div className="w-full bg-[#101010] py-2.5 px-6 sm:px-8 flex items-center justify-between rounded-none shrink-0 z-40">
+        <span className="font-sans text-[11.5px] font-normal text-white/90 leading-none">Your claim is being checked</span>
+        <span className="font-sans text-[11.5px] font-normal text-white/60 leading-none">we’ll email you</span>
+      </div>
+    );
+  }
+  return (
+    <div
+      onClick={() => onOpenClaim(project)}
+      className="w-full bg-[#101010] py-2.5 px-6 sm:px-8 flex items-center justify-between cursor-pointer rounded-none group shrink-0 z-40"
+    >
+      <span className="font-sans text-[11.5px] font-normal text-white/90 leading-none">
+        Is this your thing?
+      </span>
+      <div className="flex items-center gap-1 font-sans text-[11.5px] font-normal text-white/90 leading-none">
+        <span className="leading-none">claim</span>
+        <ArrowRight className="w-3.5 h-3.5 shrink-0 text-white/90 group-hover:translate-x-0.5 transition-transform duration-200" />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 interface ProjectDetailsProps {
   project: Project;
@@ -91,6 +104,7 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   const [isBuildNotesExpanded, setIsBuildNotesExpanded] = useState(false);
 
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { isClaimPending } = useClaims();
   const favorited = isFavorite(project.id);
 
   const { pathname } = useLocation();
@@ -264,6 +278,10 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
               <span className="text-mono-10 !text-[#0011FF] font-medium">@ileri</span>
             </button>
           )
+        ) : isClaimPending(project.id) ? (
+          <span className="tool-pill inline-flex items-center gap-1" title="Your claim is being checked">
+            <span className="text-mono-10 !text-secondary">claim pending</span>
+          </span>
         ) : (
           <button
             onClick={() => onOpenClaim(project)}

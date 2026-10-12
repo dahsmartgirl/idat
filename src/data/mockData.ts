@@ -63,6 +63,17 @@ export const MOCK_BUILDERS: Record<string, Builder> = {
     foundingNumber: 211,
     joinedDate: 'July 2026',
     topTools: ['cursor', 'codex']
+  },
+  // Just joined, nothing added yet (shows the empty profile)
+  'nova': {
+    id: 'b-nova',
+    username: 'nova',
+    displayName: 'Nova Okafor',
+    role: 'Designer learning to build',
+    bio: 'Just getting started with Claude Code. First thing coming soon.',
+    isFoundingBuilder: false,
+    joinedDate: 'October 2026',
+    topTools: []
   }
 };
 

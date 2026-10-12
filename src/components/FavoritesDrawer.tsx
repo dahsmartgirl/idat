@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '../types';
 import { useFavorites } from '../context/FavoritesContext';
 import { X, Bookmark } from './icons';
+import { EmptyState } from './EmptyState';
 import { ToolLogo } from './ToolLogos';
 import { MockupCanvas } from './mockup/MockupCanvas';
 
@@ -89,18 +90,13 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
             {/* List */}
             <div className="flex-1 overflow-y-auto px-5 sm:px-7 pb-6">
               {savedProjects.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center gap-3 pb-16">
-                  <div className="w-10 h-10 rounded-full bg-[#E9E9E9] flex items-center justify-center text-[#101010] mb-1">
-                    <Bookmark className="w-4 h-4" />
-                  </div>
-                  <h3 className="text-inter-16 !text-[#101010]">nothing saved yet</h3>
-                  <p className="text-inter-14 max-w-[220px] text-pretty">
-                    tap the bookmark on any thing to keep it here.
-                  </p>
-                  <button onClick={onClose} className="btn-main mt-2">
-                    browse things
-                  </button>
-                </div>
+                <EmptyState
+                  art="saved"
+                  className="h-full pb-16 !px-0"
+                  title="nothing saved yet"
+                  text="tap the bookmark on any thing and it’ll wait for you here."
+                  actions={<button onClick={onClose} className="btn-main">browse things</button>}
+                />
               ) : (
                 <ul className="flex flex-col gap-1">
                   <AnimatePresence initial={false}>

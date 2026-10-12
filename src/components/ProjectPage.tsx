@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { Project } from '../types';
 import { ProjectDetails, UnclaimedBanner } from './ProjectDetails';
 import { handleFromPath, projectPath } from '../lib/paths';
+import { NotFoundPage } from './NotFoundPage';
 
 interface ProjectPageProps {
   projects: Project[];
@@ -23,14 +24,7 @@ export const ProjectPage: React.FC<ProjectPageProps> = ({ projects, onSelectBuil
   // Opened by expanding the drawer (the drawer already did the motion) vs a direct visit
   const fromExpand = !!(state as { backgroundLocation?: unknown } | null)?.backgroundLocation;
 
-  if (!project) {
-    return (
-      <div className="w-full max-w-[860px] mx-auto px-4 sm:px-8 py-20 text-center space-y-2">
-        <h1 className="text-inter-16 !text-[#101010]">this thing doesn't exist</h1>
-        <Link to="/" className="text-inter-14 hover:underline">back to all things</Link>
-      </div>
-    );
-  }
+  if (!project) return <NotFoundPage kind="project" />;
 
   // Each builder has their own address for the project; claimed /p/ links and non-builder usernames forward
   const canonical = projectPath(project, handleFromPath(pathname));
