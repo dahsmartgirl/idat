@@ -12,6 +12,7 @@ import { MockupEditor, type MockupTab } from './mockup/MockupEditor';
 import { ShotStrip } from './mockup/ShotStrip';
 import { createShotFromFile } from './mockup/layout';
 import type { MediaShot, MockupSettings } from './mockup/types';
+import { slugify } from '../lib/paths';
 
 interface SubmitPageProps {
   onSubmitSuccess: (newProject: Partial<Project>) => void;
@@ -441,6 +442,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({ onSubmitSuccess, project
       } else {
         onSubmitSuccess({
           id: `proj-${Date.now()}`,
+          slug: slugify(name, projects.map((p) => p.slug)),
           name,
           tagline,
           description: tagline,

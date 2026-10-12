@@ -1,25 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '../types';
-import { getBuilderGradient } from '../types';
-import { ModelLogo, ToolLogo } from './ToolLogos';
-import { getTool } from '../data/catalog';
-import { MockupCanvas } from './mockup/MockupCanvas';
-import { 
-  X, 
-  ArrowUpRight, 
-  ArrowRight,
-  Bookmark, 
-  GitFork, 
-  Copy, 
-  Check,
-  Maximize2,
-  ChevronLeft,
-  ChevronRight,
-  Edit
-} from './icons';
-import { useFavorites } from '../context/FavoritesContext';
+import { X } from './icons';
+import { ProjectDetails, UnclaimedBanner } from './ProjectDetails';
 
+// Matches the full project page's column (ProjectPage)
+const PAGE_COLUMN_WIDTH = 860;
+// Smooth ease-out (quint): quick to respond, long gentle settle
+const EXPAND_EASE = [0.22, 1, 0.36, 1] as const;
 
 interface ProjectDrawerProps {
   project: Project | null;
@@ -27,32 +15,11 @@ interface ProjectDrawerProps {
   onSelectBuilder?: (handle: string) => void;
   onOpenClaim: (project: Project) => void;
   onEditProject?: (project: Project) => void;
+  // Opens the project as a full page (called once the expand motion has finished)
+  onExpand?: (project: Project) => void;
+  // Called as the expand motion starts, so the page behind can slide back into place under the header
+  onExpandStart?: () => void;
 }
-
-const renderMarkdown = (text: string) => {
-  if (!text) return '';
-  let escaped = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  escaped = escaped.replace(/^##\s+(.*?)$/gm, '<h4 class="font-semibold text-[#101010] mt-3 mb-1 text-[13px] lowercase">$1</h4>');
-  escaped = escaped.replace(/^#\s+(.*?)$/gm, '<h3 class="font-bold text-[#101010] mt-4 mb-2 text-[14px] lowercase">$1</h3>');
-  escaped = escaped.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noreferrer" class="text-[#0011FF] hover:underline font-medium">$1</a>');
-  escaped = escaped.replace(/^\*\s+(.*?)$/gm, '<li class="ml-4 list-disc text-[12px] my-0.5">$1</li>');
-  escaped = escaped.replace(/^-\s+(.*?)$/gm, '<li class="ml-4 list-disc text-[12px] my-0.5">$1</li>');
-  escaped = escaped.replace(/\n\n/g, '</div><div class="mt-2.5">');
-  escaped = escaped.replace(/\n/g, '<br />');
-  return `<div class="markdown-body">${escaped}</div>`;
-};
-
-// Helper to extract clean YouTube embed URL
-const getYouTubeEmbedUrl = (url?: string) => {
-  if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return match && match[2].length === 11 ? `https://www.youtube-nocookie.com/embed/${match[2]}` : null;
-};
 
 export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   project,
@@ -60,83 +27,131 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
   onSelectBuilder,
   onOpenClaim,
   onEditProject,
+  onExpand,
+  onExpandStart,
 }) => {
-  const [copied, setCopied] = useState(false);
-  const [demoMediaIndex, setDemoMediaIndex] = useState(0);
-  const [isBuildNotesExpanded, setIsBuildNotesExpanded] = useState(false);
-  
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const favorited = project ? isFavorite(project.id) : false;
-
-  // Lock body scroll when drawer is open to hide main site scrollbar
+  // Lock page scroll while the drawer is open. Locked on <html> so its reserved scrollbar gutter stays and the
+  // page width doesn't change (the expand motion lines up with the page using that width)
   useEffect(() => {
     if (project) {
-      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     };
   }, [project]);
 
-  const handleShare = () => {
-    if (!project) return;
-    navigator.clipboard.writeText(`https://idat.xyz/p/${project.slug}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  // Expand, animated only with transform / opacity / blur so it stays on the GPU (no per-frame layout):
+  // the drawer's background scales out to fill the area under the header, the drawer's content dissolves,
+  // and the project, laid out once at its final place, comes into focus. Then the real page swaps in underneath
+  // while nothing is moving
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [expandState, setExpandState] = useState<{
+    id: string;
+    startScale: number; // drawer width / full width, for the background's starting scaleX
+    panelLeft: number;
+    pageWidth: number;
+    columnX: number;
+    top: number;
+  } | null>(null);
+  // Only counts for the project it was started on, so a newly opened drawer never starts expanded
+  const expand = project && expandState?.id === project.id ? expandState : null;
+
+  // Forget it once the drawer is gone (the exiting drawer already rendered with it, so its fade still runs)
+  const projectId = project?.id;
+  useEffect(() => {
+    if (!projectId) setExpandState(null);
+  }, [projectId]);
+
+  const startExpand = () => {
+    if (!panelRef.current || !project || expand) return;
+    // The page sits under the header and is centered in the page's content width (measured on <main>: the
+    // viewport minus the reserved scrollbar gutter)
+    const pageWidth = document.querySelector('main')?.clientWidth ?? document.documentElement.clientWidth;
+    const columnWidth = Math.min(PAGE_COLUMN_WIDTH, pageWidth);
+    const panel = panelRef.current.getBoundingClientRect();
+    const fullWidth = panelRef.current.parentElement?.clientWidth ?? window.innerWidth;
+    const top = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0;
+    setExpandState({
+      id: project.id,
+      startScale: panel.width / fullWidth,
+      panelLeft: panel.left,
+      pageWidth,
+      columnX: (pageWidth - columnWidth) / 2,
+      top,
+    });
+    onExpandStart?.();
   };
-
-  if (!project) return null;
-
-  const youtubeEmbedUrl = getYouTubeEmbedUrl(project.youtubeUrl || project.demoUrl);
-  // Shots after the cover fill the demo carousel; with no shots and no video the section is hidden
-  const extraShots = project.media?.slice(1) ?? [];
-  const totalDemoSlides = Math.max(1, extraShots.length);
-  const currentSlide = demoMediaIndex % totalDemoSlides;
-  const hasDemoShowcase = !!youtubeEmbedUrl || extraShots.length > 0;
-
-  const nextDemoMedia = () => {
-    setDemoMediaIndex((prev) => (prev + 1) % totalDemoSlides);
-  };
-
-  const prevDemoMedia = () => {
-    setDemoMediaIndex((prev) => (prev - 1 + totalDemoSlides) % totalDemoSlides);
-  };
-
-  // Build notes combined plain text
-  const fullNotesText = [
-    project.buildNotes?.whyBuilt,
-    project.buildNotes?.aiRoleAndPrompts,
-    project.buildNotes?.challengesAndFailures,
-  ].filter(Boolean).join('\n\n');
-
-  const shortNotesText = fullNotesText.length > 180 
-    ? fullNotesText.slice(0, 180) + '...' 
-    : fullNotesText;
 
   return (
     <AnimatePresence>
       {project && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
+        // Closing is instant, as before; after expanding, the page has swapped in pixel-identical underneath
+        <motion.div
+          key="project-drawer"
+          className={`fixed inset-0 z-50 overflow-hidden flex justify-end ${expand ? 'pointer-events-none' : ''}`}
+        >
           
           {/* Backdrop Blur matching FilterDrawer */}
+          {/* Fades away while expanding, uncovering the header */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
-            onClick={onClose}
+            animate={{ opacity: expand ? 0 : 1 }}
+            transition={{ duration: expand ? 0.45 : 0.25, ease: [0.25, 1, 0.5, 1] }}
+            onClick={expand ? undefined : onClose}
             className="fixed inset-0 bg-black/20 backdrop-blur-[4px]"
           />
 
-          {/* Side Drawer Body (540px desktop, zero rounded corners on media, zero footer) */}
+          {expand && (
+            <>
+              {/* The drawer's background growing to fill the area under the header (scaled: plain colour, so
+                  it looks like a resize but costs nothing) */}
+              <motion.div
+                initial={{ scaleX: expand.startScale, y: 0 }}
+                animate={{ scaleX: 1, y: expand.top }}
+                transition={{ duration: 0.6, ease: EXPAND_EASE }}
+                style={{ originX: 1, originY: 0, willChange: 'transform' }}
+                className="absolute inset-0 bg-page"
+              />
+
+              {/* The project in its final layout (same structure as ProjectPage), coming into focus */}
+              <motion.div
+                initial={{ opacity: 0, filter: 'blur(12px)', x: (expand.panelLeft - expand.columnX) * 0.2 }}
+                animate={{ opacity: 1, filter: 'blur(0px)', x: 0 }}
+                transition={{ duration: 0.65, delay: 0.12, ease: EXPAND_EASE }}
+                onAnimationComplete={() => onExpand?.(project)}
+                style={{ top: expand.top, width: expand.pageWidth, willChange: 'transform, opacity, filter' }}
+                className="absolute left-0"
+              >
+                {!project.isClaimed && <UnclaimedBanner project={project} onOpenClaim={onOpenClaim} />}
+                <div className="w-full max-w-[860px] mx-auto p-6 sm:p-8 space-y-5">
+                  <ProjectDetails
+                    project={project}
+                    onSelectBuilder={onSelectBuilder}
+                    onOpenClaim={onOpenClaim}
+                    onEditProject={onEditProject}
+                    onCollapse={() => {}}
+                  />
+                </div>
+              </motion.div>
+            </>
+          )}
+
+          {/* Side Drawer Body (540px desktop, zero rounded corners on media, zero footer).
+              When expanding, it dissolves (fades and blurs out, drifting toward the page) without changing size */}
           <motion.div
+            ref={panelRef}
             initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-            drag="x"
+            animate={
+              expand
+                ? { x: (expand.columnX - expand.panelLeft) * 0.3, y: expand.top * 0.5, opacity: 0, filter: 'blur(8px)' }
+                : { x: 0 }
+            }
+            transition={expand ? { duration: 0.4, ease: EXPAND_EASE } : { duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+            style={expand ? { willChange: 'transform, opacity, filter' } : undefined}
+            drag={expand ? false : 'x'}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={{ left: 0, right: 0.7 }}
             onDragEnd={(_, info) => {
@@ -144,14 +159,13 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
                 onClose();
               }
             }}
-            className="relative w-[calc(100vw-64px)] sm:w-[540px] max-w-[540px] h-full bg-page shadow-2xl flex flex-col z-50 overflow-visible touch-pan-y"
+            className="relative h-full bg-page flex flex-col z-50 overflow-visible touch-pan-y w-[calc(100vw-64px)] sm:w-[540px] max-w-[540px] shadow-2xl"
           >
             
             {/* Big Solid White Floating X Pill Button matching FilterDrawer 1:1 */}
             <motion.button
               initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.85 }}
+              animate={expand ? { opacity: 0, scale: 0.85 } : { opacity: 1, scale: 1 }}
               transition={{ duration: 0.12 }}
               onClick={onClose}
               className="absolute -left-13 top-5 sm:-left-16 sm:top-6 flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-white text-[#101010] rounded-full shadow-2xl hover:scale-110 transition-transform cursor-pointer border border-[#E9E9E9] z-50"
@@ -160,278 +174,26 @@ export const ProjectDrawer: React.FC<ProjectDrawerProps> = ({
               <X className="w-5 h-5 stroke-[2.2]" />
             </motion.button>
 
-            {/* 1. Full Drawer Width Sticky Unclaimed Banner (Lighter font-normal typography) */}
-            {!project.isClaimed && (
-              <div 
-                onClick={() => onOpenClaim(project)}
-                className="w-full bg-[#101010] py-2.5 px-6 sm:px-8 flex items-center justify-between cursor-pointer rounded-none group shrink-0 z-40"
-              >
-                <span className="font-sans text-[11.5px] font-normal text-white/90 leading-none">
-                  Is this your thing?
-                </span>
-                <div className="flex items-center gap-1 font-sans text-[11.5px] font-normal text-white/90 leading-none">
-                  <span className="leading-none">claim</span>
-                  <ArrowRight className="w-3.5 h-3.5 shrink-0 text-white/90 group-hover:translate-x-0.5 transition-transform duration-200" />
-                </div>
-              </div>
-            )}
+            {!project.isClaimed && <UnclaimedBanner project={project} onOpenClaim={onOpenClaim} />}
 
             {/* Single Scrollable Content Body (Only drawer content scrolls below sticky banner) */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5">
 
-              {/* Grouped Top Block: Expand Icon on LEFT, Action Icons on RIGHT, then Title, Description, and Owner Tag */}
-              <div className="space-y-1.5">
-                
-                {/* Top Row: Expand Icon on the LEFT, other icons on the RIGHT */}
-                <div className="flex items-center justify-between pb-1">
-                  
-                  {/* Left: Expand View Icon */}
-                  <button
-                    className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer -ml-1"
-                    title="Expand view"
-                  >
-                    <Maximize2 className="w-4 h-4" />
-                  </button>
-
-                  {/* Right: Bookmark, Copy Link, Remix, Live Link */}
-                  <div className="flex items-center gap-1">
-                    {/* Bookmark */}
-                    <button
-                      onClick={() => toggleFavorite(project.id)}
-                      className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
-                      title="Bookmark"
-                    >
-                      <Bookmark className={`w-4 h-4 ${favorited ? 'fill-current text-[#101010]' : ''}`} />
-                    </button>
-
-                    {/* Copy Link */}
-                    <button
-                      onClick={handleShare}
-                      className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
-                      title="Copy link"
-                    >
-                      {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                    </button>
-
-                    {/* Remix (Source code/Fork link) */}
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
-                        title="Remix / Source Code"
-                      >
-                        <GitFork className="w-4 h-4" />
-                      </a>
-                    )}
-
-                    {/* Live Link */}
-                    {project.demoUrl && (
-                      <a
-                        href={project.demoUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1 text-secondary hover:text-[#101010] transition-colors cursor-pointer"
-                        title="Visit live link"
-                      >
-                        <ArrowUpRight className="w-4 h-4" />
-                      </a>
-                    )}
-
-                    {/* Edit Project (Only if claimed by active user 'ileri') */}
-                    {project.isClaimed && project.claimedBy.some(h => h.toLowerCase() === 'ileri') && onEditProject && (
-                      <button
-                        onClick={() => onEditProject(project)}
-                        className="p-1 text-secondary hover:text-[#0011FF] transition-colors cursor-pointer"
-                        title="Edit project details"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Title */}
-                <h1 className="text-inter-16 font-semibold text-[#101010] text-[18px] sm:text-[20px] leading-tight">
-                  {project.name}
-                </h1>
-
-                {/* Description / Tagline */}
-                {project.tagline && (
-                  <p className="text-inter-14 text-secondary text-[13px] leading-snug">
-                    {project.tagline}
-                  </p>
-                )}
-
-                {/* Owner Tag (Pill style: 'unclaimed' when project is not claimed) */}
-                <div className="pt-1 flex items-center gap-1.5 flex-wrap">
-                  {project.isClaimed ? (
-                    project.claimedBy && project.claimedBy.length > 0 ? (
-                      project.claimedBy.map((builder) => (
-                        <button
-                          key={builder}
-                          onClick={() => {
-                            onClose();
-                            if (onSelectBuilder) {
-                              onSelectBuilder(builder);
-                            }
-                          }}
-                          className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1.5"
-                          title={`View @${builder} profile`}
-                        >
-                          {/* Gradient Avatar Circle */}
-                          <div className={`w-3.5 h-3.5 rounded-full ${getBuilderGradient(builder)} shrink-0`} />
-                          <span className="text-mono-10 !text-[#0011FF] font-medium">@{builder}</span>
-                        </button>
-                      ))
-                    ) : (
-                      <button
-                        onClick={() => {
-                          onClose();
-                          if (onSelectBuilder) {
-                            onSelectBuilder('ileri');
-                          }
-                        }}
-                        className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1.5"
-                        title="View @ileri profile"
-                      >
-                        <div className={`w-3.5 h-3.5 rounded-full ${getBuilderGradient('ileri')} shrink-0`} />
-                        <span className="text-mono-10 !text-[#0011FF] font-medium">@ileri</span>
-                      </button>
-                    )
-                  ) : (
-                    <button
-                      onClick={() => onOpenClaim(project)}
-                      className="tool-pill cursor-pointer hover:!bg-[#D9D9D9] transition-colors inline-flex items-center gap-1"
-                      title="Claim this project"
-                    >
-                      <span className="text-mono-10 !text-secondary">unclaimed</span>
-                    </button>
-                  )}
-                </div>
-
-              </div>
-
-              {/* Main Screenshot: the cover mockup (nothing shown when there's no media) */}
-              {project.media?.[0] && (
-                <div className="w-full shadow-xs">
-                  <MockupCanvas shot={project.media[0]} />
-                </div>
-              )}
-
-              {/* Section 1: stack */}
-              <div className="space-y-1.5">
-                <span className="block text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal mb-1.5">
-                  stack
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {/* First render AI Tools */}
-                  {project.aiTools && project.aiTools.map((toolId) => (
-                    <div key={toolId} className="tool-pill">
-                      <ToolLogo toolId={toolId} size={11} />
-                      <span className="text-mono-10">{getTool(toolId)?.name ?? toolId}</span>
-                    </div>
-                  ))}
-                  
-                  {/* Next render AI Models */}
-                  {project.aiModel && project.aiModel.split(',').map(m => m.trim()).filter(Boolean).map((modelName) => (
-                    <div key={modelName} className="tool-pill">
-                      <ModelLogo model={modelName} size={11} />
-                      <span className="text-mono-10">{modelName}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Section 2: build notes (Plain Paragraph, NO BG, NO Border, Expandable "see more") */}
-              <div className="space-y-1.5">
-                <span className="block text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal mb-1.5">
-                  build notes
-                </span>
-                <div className="text-inter-14 text-secondary leading-relaxed text-[13px] space-y-1">
-                  <div 
-                    dangerouslySetInnerHTML={{ 
-                      __html: renderMarkdown(isBuildNotesExpanded ? fullNotesText : shortNotesText) 
-                    }} 
-                  />
-                  {fullNotesText.length > 180 && (
-                    <button
-                      onClick={() => setIsBuildNotesExpanded(!isBuildNotesExpanded)}
-                      className="text-[#101010] font-semibold hover:underline cursor-pointer inline-block mt-1"
-                    >
-                      {isBuildNotesExpanded ? 'see less' : 'see more'}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Section 3: demo showcase / video (only when there's a video or extra shots to show) */}
-              {hasDemoShowcase && (
-              <div className="space-y-1.5 pb-4">
-                <span className="block text-[#101010] font-sans text-[11px] font-medium lowercase tracking-normal mb-1.5">
-                  demo showcase
-                </span>
-                
-                {youtubeEmbedUrl ? (
-                  <div className="w-full aspect-square rounded-none overflow-hidden bg-black shadow-xs">
-                    <iframe
-                      className="w-full h-full border-0"
-                      src={youtubeEmbedUrl}
-                      title={`${project.name} Video Demo`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                ) : (
-                  <div className="relative w-full aspect-square bg-[#D9D9D9] rounded-none overflow-hidden group shadow-xs">
-                    <MockupCanvas shot={extraShots[currentSlide]} fill />
-
-                    {totalDemoSlides > 1 && (
-                    <>
-                    {/* Carousel Left/Right Navigation */}
-                    <button
-                      onClick={prevDemoMedia}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/80 text-[#101010] flex items-center justify-center shadow-md hover:bg-white transition-colors cursor-pointer rounded-none"
-                      title="Previous slide"
-                      aria-label="Previous slide"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-
-                    <button
-                      onClick={nextDemoMedia}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/80 text-[#101010] flex items-center justify-center shadow-md hover:bg-white transition-colors cursor-pointer rounded-none"
-                      title="Next slide"
-                      aria-label="Next slide"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-
-                    {/* 3 Pagination Dots */}
-                    <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/30 px-2 py-1 backdrop-blur-xs">
-                      {Array.from({ length: totalDemoSlides }).map((_, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => setDemoMediaIndex(idx)}
-                          className={`w-1.5 h-1.5 transition-colors cursor-pointer ${
-                            idx === currentSlide ? 'bg-white' : 'bg-white/40'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    </>
-                    )}
-                  </div>
-                )}
-              </div>
-              )}
+              <ProjectDetails
+                key={project.id}
+                project={project}
+                onSelectBuilder={onSelectBuilder}
+                onOpenClaim={onOpenClaim}
+                onEditProject={onEditProject}
+                onExpand={onExpand ? startExpand : undefined}
+                onLeave={onClose}
+              />
 
             </div>
 
           </motion.div>
 
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

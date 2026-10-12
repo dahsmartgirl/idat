@@ -23,6 +23,11 @@
   scrollbar-color: #C2C2C2 var(--color-page);
 }
 
+/* Keep the scrollbar's space reserved, so locking scroll (drawers) or short pages never shift the layout */
+html {
+  scrollbar-gutter: stable;
+}
+
 html, body {
   background-color: var(--color-page) !important;
   color: var(--color-secondary) !important;

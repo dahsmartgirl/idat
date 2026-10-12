@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useMemo, useEffect, useLayoutEffect, useCallback, useRef, type ReactNode } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useNavigationType, useParams, type Location } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { Header } from './components/Header';
@@ -9,14 +9,30 @@ import { ProjectDrawer } from './components/ProjectDrawer';
 import { BuilderProfilePage } from './components/BuilderProfilePage';
 import { SubmitModal } from './components/SubmitModal';
 import { SubmitPage } from './components/SubmitPage';
+import { ProjectPage } from './components/ProjectPage';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { FilterDrawer } from './components/FilterDrawer';
 import { MOCK_PROJECTS } from './data/mockData';
 import type { Project, FilterState } from './types';
+import { handleFromPath, profilePath, projectPath } from './lib/paths';
+
+// Old profile links (/josh, /b/josh, /builder/josh) forward to /@josh
+function LegacyProfileRedirect() {
+  const { username = '' } = useParams<{ username: string }>();
+  return <Navigate to={profilePath(username)} replace />;
+}
 
 function AppLayout() {
   const navigate = useNavigate();
+  // React Router hands out a new navigate on every URL change; handlers passed to the feed use this stable
+  // one, so the memoized grid and its cards don't all re-render on each page change
+  const navigateRef = useRef(navigate);
+  navigateRef.current = navigate;
   const location = useLocation();
+  // An expanded project remembers the page it came from (history state backgroundLocation). That page stays
+  // mounted but hidden while the project shows, so closing brings it straight back: no rebuild, same scroll
+  const backgroundLocation = (location.state as { backgroundLocation?: Location } | null)?.backgroundLocation;
+  const pageLocation = backgroundLocation ?? location;
   
   const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,18 +61,64 @@ function AppLayout() {
 
   // Modals & Drawers state
   const [activeProject, setActiveProject] = useState<Project | null>(null);
+  // The page the drawer was opened on: it only shows there, so it's gone in the same render a navigation lands
+  const [activeProjectPath, setActiveProjectPath] = useState('');
+  const openProject = activeProject && activeProjectPath === location.pathname ? activeProject : null;
   const [claimingProject, setClaimingProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isSubmitOpen, setIsSubmitOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  // While the drawer expands into the full page, the page behind slides back under the header
+  const [isExpanding, setIsExpanding] = useState(false);
 
-  // Clean up drawer states and scroll to top whenever the URL route changes
+  // Remember each page's scroll position, so going back to it lands where you were. The browser's own
+  // restoration is off: it fires before our pages have laid out and fights this
+  const navigationType = useNavigationType();
+  const navigationTypeRef = useRef(navigationType);
+  navigationTypeRef.current = navigationType;
+  const scrollPositions = useRef(new Map<string, number>());
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  }, []);
+  // Swapped before paint and before the restore below, so scrolls caused by changing page are recorded
+  // against the new entry and never overwrite the old one's position
+  useLayoutEffect(() => {
+    const key = location.key;
+    const onScroll = () => scrollPositions.current.set(key, window.scrollY);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [location.key]);
+
+  // New pages start at the top; back/forward restores once the page is tall enough. Runs before paint, so a
+  // new page never shows a frame at the old scroll position
+  useLayoutEffect(() => {
+    const y = navigationTypeRef.current === 'POP' ? scrollPositions.current.get(location.key) ?? 0 : 0;
+    let frame = 0;
+    let tries = 0;
+    const restore = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll >= y || ++tries > 30) window.scrollTo(0, y);
+      else frame = requestAnimationFrame(restore);
+    };
+    restore();
+    return () => cancelAnimationFrame(frame);
+  }, [location.key]);
+
+  // Once an expanded project's page is showing, the drawer it grew from is done: closing the page returns to
+  // the feed, not the drawer. (Cleared after the page commits; until then the drawer hides itself by path.)
+  useEffect(() => {
+    if (!backgroundLocation) return;
+    setActiveProject(null);
+    setIsExpanding(false);
+  }, [backgroundLocation, location.key]);
+
+  // Close the drawers whenever the page changes (expanding a project and closing it again doesn't count)
+  useEffect(() => {
     setActiveProject(null);
     setIsFilterDrawerOpen(false);
     setIsFavoritesOpen(false);
-  }, [location.pathname]);
+  }, [pageLocation.key]);
+
 
   // Filter calculation logic for Home Grid
   const filteredProjects = useMemo(() => {
@@ -125,18 +187,24 @@ function AppLayout() {
     setActiveProject(null);
     setIsFilterDrawerOpen(false);
     setIsFavoritesOpen(false);
-    navigate(`/${cleanHandle}`);
-  }, [navigate]);
+    navigateRef.current(profilePath(cleanHandle));
+  }, []);
 
   const handleOpenClaim = useCallback((project: Project) => {
     setClaimingProject(project);
     setIsSubmitOpen(true);
   }, []);
 
+  const handleEditProject = useCallback((project: Project) => {
+    setActiveProject(null);
+    navigateRef.current(`/edit/${project.slug}`);
+  }, []);
+
   const handleSelectProject = useCallback((project: Project) => {
     setIsFilterDrawerOpen(false);
     setIsFavoritesOpen(false);
     setActiveProject(project);
+    setActiveProjectPath(window.location.pathname);
   }, []);
 
   const handleAddProject = (newProjectData: Partial<Project>) => {
@@ -166,11 +234,13 @@ function AppLayout() {
         } : null);
       }
       setClaimingProject(null);
-    } else if (editingProject) {
+    } else if (editingProject || projects.some((p) => p.id === newProjectData.id)) {
+      // Edits come from the old modal (editingProject) or from /edit/:slug (full project with its id)
+      const editedId = editingProject?.id ?? newProjectData.id;
       setProjects((prev) =>
-        prev.map((p) => (p.id === editingProject.id ? { ...p, ...newProjectData } as Project : p))
+        prev.map((p) => (p.id === editedId ? { ...p, ...newProjectData } as Project : p))
       );
-      if (activeProject && activeProject.id === editingProject.id) {
+      if (activeProject && activeProject.id === editedId) {
         setActiveProject((prev) => prev ? { ...prev, ...newProjectData } as Project : null);
       }
       setEditingProject(null);
@@ -179,22 +249,41 @@ function AppLayout() {
     }
   };
 
-  const renderProfilePage = () => (
+  const renderProfilePage = (username: string) => (
     <BuilderProfilePage
+      key={username}
+      username={username}
       searchQuery={searchQuery}
       onSelectProject={handleSelectProject}
       onOpenClaim={handleOpenClaim}
       onSelectBuilder={handleSelectBuilder}
-      activeProject={activeProject}
+      activeProject={openProject}
     />
   );
+
+  const renderProjectPage = () => (
+    <ProjectPage
+      projects={projects}
+      onSelectBuilder={handleSelectBuilder}
+      onOpenClaim={handleOpenClaim}
+      onEditProject={handleEditProject}
+    />
+  );
+
+  // A new page snaps the pushed content back into place; only drawers opening/closing on a page slide it
+  const lastPathname = useRef(pageLocation.pathname);
+  const routeJustChanged = lastPathname.current !== pageLocation.pathname;
+  useEffect(() => {
+    lastPathname.current = pageLocation.pathname;
+  });
 
   // Exact push offset calculation for both mobile (leaves 64px left gap) & desktop (-540 / -370)
   const pushX = useMemo(() => {
     const isMobile = windowWidth < 640;
     const mobileOffset = -(windowWidth - 64);
 
-    if (activeProject) {
+    if (isExpanding || backgroundLocation) return 0;
+    if (openProject) {
       return isMobile ? mobileOffset : -540;
     }
     if (isFilterDrawerOpen) {
@@ -204,7 +293,7 @@ function AppLayout() {
       return isMobile ? mobileOffset : -370;
     }
     return 0;
-  }, [activeProject, isFilterDrawerOpen, isFavoritesOpen, windowWidth]);
+  }, [isExpanding, backgroundLocation, openProject, isFilterDrawerOpen, isFavoritesOpen, windowWidth]);
 
   return (
     <div className="min-h-screen bg-page text-secondary flex flex-col font-sans w-full overflow-x-clip relative">
@@ -214,7 +303,13 @@ function AppLayout() {
         animate={{
           x: pushX,
         }}
-        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+        transition={
+          routeJustChanged
+            ? { duration: 0 }
+            : isExpanding
+              ? { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+              : { duration: 0.3, ease: [0.25, 1, 0.5, 1] }
+        }
         className="flex-1 flex flex-col w-full"
       >
         {/* PERSISTENT HEADER across all routes */}
@@ -230,7 +325,9 @@ function AppLayout() {
 
         {/* Dynamic Main Body Content via Router */}
         <main className="flex-1 w-full py-2">
-          <Routes>
+          {/* The page an expanded project came from: kept mounted (same width, zero height, invisible) under it */}
+          <div className={backgroundLocation ? 'h-0 overflow-hidden invisible' : undefined} aria-hidden={!!backgroundLocation}>
+          <Routes location={pageLocation}>
             {/* HOME PAGE ROUTE */}
             <Route
               path="/"
@@ -259,27 +356,44 @@ function AppLayout() {
             {/* Edit Project Page */}
             <Route path="/edit/:slug" element={<SubmitPage onSubmitSuccess={handleAddProject} projects={projects} />} />
 
-            {/* Profile Route variations: /b/:username, /builder/:username, /:username */}
-            <Route path="/b/:username" element={renderProfilePage()} />
-            <Route path="/builder/:username" element={renderProfilePage()} />
-            <Route path="/:username" element={renderProfilePage()} />
-            
-            {/* Fallback route to prevent any 404s */}
-            <Route path="*" element={renderProfilePage()} />
+            {/* Unclaimed projects (forwards to /@username/slug once claimed) */}
+            <Route path="/p/:slug" element={renderProjectPage()} />
+
+            {/* Profiles (/@username) and projects (/@username/slug) */}
+            <Route path="/:handle" element={<HandleRoute render={renderProfilePage} />} />
+            <Route path="/:handle/:slug" element={<HandleRoute render={() => renderProjectPage()} />} />
+
+            {/* Old profile links */}
+            <Route path="/b/:username" element={<LegacyProfileRedirect />} />
+            <Route path="/builder/:username" element={<LegacyProfileRedirect />} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </div>
+
+          {/* EXPANDED PROJECT, shown in place of the page it came from */}
+          {backgroundLocation && (
+            <Routes location={location}>
+              <Route path="/p/:slug" element={renderProjectPage()} />
+              <Route path="/:handle/:slug" element={<HandleRoute render={() => renderProjectPage()} />} />
+            </Routes>
+          )}
         </main>
       </motion.div>
 
       {/* PROJECT DETAILS SIDE DRAWER */}
       <ProjectDrawer
-        project={activeProject}
+        project={openProject}
         onClose={() => setActiveProject(null)}
         onSelectBuilder={handleSelectBuilder}
         onOpenClaim={handleOpenClaim}
-        onEditProject={(project) => {
-          setActiveProject(null);
-          navigate(`/edit/${project.slug}`);
-        }}
+        onEditProject={handleEditProject}
+        onExpandStart={() => setIsExpanding(true)}
+        onExpand={(project) =>
+          // Hand over to the page. The drawer disappears in the same render the page appears (it only shows
+          // on the path it was opened on), so there's no gap between them
+          navigate(projectPath(project, handleFromPath(location.pathname)), { state: { backgroundLocation: location } })
+        }
       />
 
       {/* FILTER EXPANDABLE SIDE DRAWER */}
@@ -317,6 +431,15 @@ function AppLayout() {
 
     </div>
   );
+}
+
+// Paths whose first segment starts with @ belong to a builder; any other single word is an old profile link
+function HandleRoute({ render }: { render: (username: string) => ReactNode }) {
+  const { handle = '', slug } = useParams<{ handle: string; slug?: string }>();
+  if (!handle.startsWith('@')) {
+    return <Navigate to={slug ? '/' : profilePath(handle)} replace />;
+  }
+  return <>{render(handle.slice(1).toLowerCase())}</>;
 }
 
 export default function App() {

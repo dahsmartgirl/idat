@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Project, FilterState } from '../types';
 import { getBuilderGradient } from '../types';
@@ -10,6 +9,7 @@ import { FilterDrawer } from './FilterDrawer';
 import { ToolLogo } from './ToolLogos';
 
 interface BuilderProfilePageProps {
+  username: string;
   onSelectProject: (project: Project) => void;
   onOpenClaim: (project: Project) => void;
   onSelectBuilder: (handle: string) => void;
@@ -61,13 +61,13 @@ const ScrambleNumber: React.FC<{ value: number; color?: string }> = ({ value, co
 };
 
 export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
+  username,
   onSelectProject,
   onOpenClaim,
   onSelectBuilder,
   searchQuery = '',
   activeProject = null,
 }) => {
-  const { username } = useParams<{ username: string }>();
   const cleanHandle = (username || 'ileri').replace('@', '').toLowerCase();
 
   const [filters, setFilters] = useState<FilterState>({
@@ -217,7 +217,8 @@ export const BuilderProfilePage: React.FC<BuilderProfilePageProps> = ({
       >
         
         {/* Top Profile Header Block */}
-        <div className="w-full px-4 sm:px-8 pt-6 sm:pt-10 space-y-4">
+        {/* Centered column on tablet/desktop (same layout as mobile, just not stretched full width) */}
+        <div className="w-full sm:max-w-[860px] sm:mx-auto px-4 sm:px-8 pt-6 sm:pt-10 space-y-4">
           
           {/* Row 1: Pure Gradient Avatar + User Info Column */}
           <div className="flex items-center gap-4 sm:gap-8 min-w-0">
